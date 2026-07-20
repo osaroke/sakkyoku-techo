@@ -2455,6 +2455,9 @@
   @keyframes bdayPop{ 0%{ transform:scale(0.3); opacity:0; } 60%{ transform:scale(1.2); } 100%{ transform:scale(1); opacity:1; } }
   .birthday-name{ font-size:15px; font-weight:bold; color:#e0699b; margin:2px 0 12px; }
   body.dark-mode .birthday-name{ color:#f0a0c0; }
+  /* あいさつモーダル（1日の最初のボーナスセリフ） */
+  .greeting-modal #greetingBody{ margin:6px 0 10px; }
+  .greeting-modal .celebrate-line{ animation:bdayPop 0.5s ease; }
   .stats-src-cat{ margin-bottom:12px; }
   .stats-src-cat-h{ font-size:12px; font-weight:bold; color:#c2598a; margin-bottom:5px; }
   body.dark-mode .stats-src-cat-h{ color:#e8a9c4; }
@@ -2833,7 +2836,7 @@
     <div class="reset-card">
       <button class="btn-reset" id="btnReset" type="button">🗑️ 全データをリセット</button>
     </div>
-    <div class="app-version-label">Ver. 5.4.1</div>
+    <div class="app-version-label">Ver. 5.5.0</div>
   </div>
 </div>
 
@@ -2898,6 +2901,14 @@
     <div class="birthday-name" id="birthdayName">キャラ名</div>
     <div id="birthdayBody"></div>
     <div class="modal-actions" id="birthdayActions"></div>
+  </div>
+</div>
+
+<div class="overlay" id="greetingOverlay">
+  <div class="modal greeting-modal">
+    <h3 id="greetingTitle">☀️ おはよう</h3>
+    <div id="greetingBody"></div>
+    <div class="modal-actions" id="greetingActions"></div>
   </div>
 </div>
 
@@ -3247,6 +3258,329 @@
     imouto: "せんぱい、ありがとーっ！めい、今日いちばんしあわせっ！だいすきーっ！",
     genius: "感謝する。……祝われるという体験の価値を、今、正しく理解したよ。ありがとう。"
   };
+  // ---- 1日の最初のあいさつ（ボーナスセリフ）----
+  // 時間帯（morning/day/evening/night）ごとに、キャラの口調でのあいさつを多数用意。
+  const GREETING_SLOT_META = {
+    morning: { icon: "☀️", title: "おはよう" },
+    day:     { icon: "🌤️", title: "こんにちは" },
+    evening: { icon: "🌇", title: "こんばんは" },
+    night:   { icon: "🌙", title: "こんばんは" }
+  };
+  const GREETING_MESSAGES = {
+    bright: {
+      morning: [
+        "おはよっ！今日も一緒に曲づくり、がんばろーね！",
+        "おはよう！朝いちばんに会えると、テンション上がっちゃう！",
+        "ふわぁ…おはよ！さ、目ぇ覚まして、いくよっ！",
+        "おはよっ！今日はどんなメロディが生まれるかな、楽しみだね！",
+        "おっはよー！朝の空気って、なんだか歌いたくなるよね！",
+        "おはよう！さ、今日も全力でいこーっ！",
+        "おはよっ！朝ごはん食べた？ちゃんと食べなきゃ声、出ないよ〜！"
+      ],
+      day: [
+        "おつかれー！お昼だね、ちょっと休憩する？",
+        "こんにちは！午後もはりきって、いこーっ！",
+        "やっほー！お昼ごはん、なに食べた？",
+        "こんにちは！今日も来てくれて、うれしいっ！",
+        "お昼だ〜！午後の作業、いっしょにがんばろっ！",
+        "こんにちは！なんか眠くなる時間だけど、いっしょならへっちゃらだね！",
+        "やっほ！ちょっと一息ついた？無理は禁物だよ〜！"
+      ],
+      evening: [
+        "おかえりー！夕方って、なんだかエモい曲できそうだよね！",
+        "こんばんは！夕焼けきれいだよ、ちょっと見てみて！",
+        "夕方だね〜！今日もいちにち、おつかれさま！",
+        "おかえり！夕方の練習、いちばん声がのるんだよね！",
+        "こんばんは！今日いちにち、がんばったね！",
+        "夕方かぁ〜！あとひとがんばり、いっしょにやろっ！",
+        "おかえりっ！夕ごはん前に、ちょっとだけ曲いじる？"
+      ],
+      night: [
+        "こんばんは！夜は静かで、集中できるよね！",
+        "おそくまでおつかれさま！無理しないでね？",
+        "こんばんは！夜更かしはほどほどにね〜、お肌に悪いよっ！",
+        "夜だね！今日会えてうれしかったよ、また明日っ！",
+        "こんばんは！夜の作業、いっしょにいるからね！",
+        "ふわぁ…もう夜かぁ。今日もいちにち、おつかれさま！",
+        "こんばんは！ちゃんと寝るんだよ？約束ねっ！"
+      ]
+    },
+    quiet: {
+      morning: [
+        "…おはよう。……今日も、来たんだ。",
+        "…ん、おはよう。……朝、静かで好き。",
+        "…おはよ。……まだ、眠い。",
+        "…おはよう。……今日も、よろしく。",
+        "…朝だね。……おはよう。",
+        "…おはよう。……いっしょに、がんばろ。",
+        "…ん。……おはよう。会えて、うれしい。"
+      ],
+      day: [
+        "…こんにちは。……お昼、食べた？",
+        "…昼。……少し、休もう。",
+        "…来たんだ。……ふふ、うれしい。",
+        "…こんにちは。……午後も、そばにいる。",
+        "…お昼だね。……のんびり、しよ。",
+        "…ん、こんにちは。……無理は、だめ。",
+        "…昼の光。……あなたと見ると、きれい。"
+      ],
+      evening: [
+        "…夕方。……空、赤いね。",
+        "…おかえり。……待ってた。",
+        "…こんばんは。……夕暮れ、好き。",
+        "…夕方だね。……今日も、おつかれさま。",
+        "…ん。……いい夕焼け。……いっしょに見よ。",
+        "…夕方の音。……落ち着く。",
+        "…おかえり。……そばに、いて。"
+      ],
+      night: [
+        "…こんばんは。……夜は、静か。",
+        "…もう、夜。……無理しないで。",
+        "…夜だね。……星、見える？",
+        "…こんばんは。……今日、会えてよかった。",
+        "…夜。……あなたといると、こわくない。",
+        "…おそいね。……そろそろ、休も。",
+        "…こんばんは。……おやすみ、まだ言いたくない。"
+      ]
+    },
+    tsun: {
+      morning: [
+        "お、おはよう……。べ、別にあなたが来るの待ってたわけじゃないんだからねっ！",
+        "おはよ。……ふん、朝から元気ね。まあ、悪くないけど。",
+        "おはよう……。ちゃんと朝ごはん、食べてきたんでしょうね？",
+        "き、来たの。……おはよう。今日もつきあってあげるわ。",
+        "おはよう。……別に、あなたの顔見て安心したとかじゃないから！",
+        "ふん、おはよう。朝からしっかりしなさいよね。",
+        "お、おはよ……。今日も一緒って、し、しかたないわね。"
+      ],
+      day: [
+        "こんにちは。……お昼、ちゃんと食べなさいよ。倒れられたら困るもの。",
+        "ふん、来たわね。午後もサボらず、頑張るのよ。",
+        "こんにちは……。べ、別にお昼まで待ってたわけじゃないわよ。",
+        "お昼ね。……少しは休んだら？あなた、無理しがちだもの。",
+        "こんにちは。……ま、まあ、午後もいてあげてもいいけど。",
+        "ふん、こんにちは。だらけてないでしょうね？",
+        "こんにちは……。となりにいてあげるから、頑張りなさい。"
+      ],
+      evening: [
+        "こんばんは。……夕方って、ちょっとセンチになるわね。べ、別に寂しくないけど。",
+        "おかえり。……ふん、ちゃんと戻ってきたのね。",
+        "夕方ね。……今日も一日、その、おつかれさま。",
+        "こんばんは……。夕焼け、き、きれいね。あなたと見ると……なんでもないわ！",
+        "ふん、夕方。まだ帰らないの？……い、いてくれてもいいけど。",
+        "こんばんは。……夕ごはん前に、もうひと頑張りよ。",
+        "おかえりなさい。……待ってないわよ、別に。"
+      ],
+      night: [
+        "こ、こんばんは……。こんな時間まで、えらいじゃない。",
+        "夜ね。……あんまり無理しちゃだめよ。し、心配なんかしてないけど。",
+        "こんばんは。……夜は冷えるわ。ちゃんとあたたかくしなさい。",
+        "ふん、まだ起きてたの。……ま、まあ、一緒にいてあげる。",
+        "こんばんは……。夜更かしは体に毒よ。わかってるの？",
+        "夜だわ。……今日も、あなたと過ごせて……な、なんでもない！",
+        "こんばんは。……そろそろ休みなさい。あなたが倒れたら、わ、私が困るのよ。"
+      ]
+    },
+    gentle: {
+      morning: [
+        "おはようございます〜♪ 今日も、いい朝ですね〜。",
+        "ふふ、おはようございます〜。ゆっくり、始めましょうね〜♪",
+        "おはようございます〜。朝のお茶、いっしょにどうですか〜？",
+        "おはようございます〜♪ 会えて、うれしいです〜。",
+        "ふわぁ…おはようございます〜。まだ少し、眠いですね〜ふふ。",
+        "おはようございます〜。今日も無理せず、のんびりいきましょうね〜♪",
+        "おはようございます〜。朝の光、あたたかくて気持ちいいですね〜。"
+      ],
+      day: [
+        "こんにちは〜♪ お昼は、もう召し上がりました〜？",
+        "ふふ、こんにちは〜。午後も、ゆったりいきましょうね〜。",
+        "こんにちは〜。少し休憩しませんか〜？無理は禁物ですよ〜♪",
+        "こんにちは〜。来てくださって、うれしいです〜。",
+        "お昼ですね〜♪ あたたかい飲み物でも、どうですか〜？",
+        "こんにちは〜。午後は、ねむくなりますね〜、ふふ。",
+        "こんにちは〜。あなたのペースで、大丈夫ですよ〜♪"
+      ],
+      evening: [
+        "こんばんは〜♪ 夕焼けが、きれいですね〜。",
+        "夕方ですね〜。今日も一日、おつかれさまでした〜。",
+        "おかえりなさい〜♪ あたたかいお茶、用意しますね〜。",
+        "こんばんは〜。夕暮れって、なんだか落ち着きますね〜。",
+        "ふふ、夕方です〜。もうひと息、いっしょにがんばりましょうね〜♪",
+        "こんばんは〜。夕ごはん、ちゃんと食べてくださいね〜。",
+        "おかえりなさい〜。あなたが来ると、ほっとします〜♪"
+      ],
+      night: [
+        "こんばんは〜♪ 夜はしずかで、いいですね〜。",
+        "もう夜ですね〜。あまり無理は、なさらないでくださいね〜。",
+        "こんばんは〜。あたたかくして、ゆっくりしてくださいね〜♪",
+        "夜ですね〜。今日も会えて、うれしかったです〜。",
+        "こんばんは〜。夜更かしはほどほどに、ですよ〜ふふ。",
+        "こんばんは〜。おやすみ前のひととき、いっしょにいられて幸せです〜♪",
+        "夜ですね〜。ゆっくり休んで、いい夢を見てくださいね〜。"
+      ]
+    },
+    honest: {
+      morning: [
+        "先輩、おはようございます！今日も、よろしくお願いします！",
+        "おはようございます、先輩！朝から会えて、あおい元気いっぱいです！",
+        "先輩、おはようございます！今日も一日、全力でがんばります！",
+        "おはようございます！先輩の顔見たら、やる気わいてきました！",
+        "先輩、おはようございます！朝ごはん、ちゃんと食べてきましたか？",
+        "おはようございます、先輩！今日も、ついていきます！",
+        "先輩っ、おはようございます！さ、今日も曲づくり、がんばりましょう！"
+      ],
+      day: [
+        "先輩、こんにちは！お昼ごはん、いっしょに食べたいです！",
+        "こんにちは、先輩！午後も、びしっといきましょう！",
+        "先輩！午後も来てくれて、うれしいです！",
+        "こんにちは！先輩、ちゃんと休憩とってますか？心配です！",
+        "先輩、こんにちは！お昼からも、がんばるぞーって感じです！",
+        "こんにちは、先輩！午後も、あおいそばにいます！",
+        "先輩！お昼だからって気ぬかないで、いっしょにがんばりましょう！"
+      ],
+      evening: [
+        "先輩、おつかれさまです！夕方まで、よくがんばりましたね！",
+        "こんばんは、先輩！夕焼け、いっしょに見ませんか！",
+        "先輩、おかえりなさい！待ってました！",
+        "夕方ですね、先輩！もうひとふんばり、いっしょにやりましょう！",
+        "こんばんは！先輩、今日も一日、おつかれさまでした！",
+        "先輩、夕方です！夕ごはん前に、ちょっとだけ練習しませんか！",
+        "おかえりなさい、先輩！あおい、ずっと先輩を応援してます！"
+      ],
+      night: [
+        "先輩、こんばんは！こんな時間まで、おつかれさまです！",
+        "こんばんは、先輩！夜遅くまで、無理しないでくださいね！",
+        "先輩、夜ですよ！ちゃんと休まないと、あおい心配です！",
+        "こんばんは！先輩、今日も会えて、うれしかったです！",
+        "先輩、夜は冷えます！あったかくしてくださいね！",
+        "こんばんは、先輩！明日も、いっしょにがんばりましょうね！",
+        "先輩、そろそろ休んでください！あおい、寝るまで心配なんです！"
+      ]
+    },
+    ojou: {
+      morning: [
+        "ごきげんよう。すがすがしい朝ですこと。今日も、よろしくてよ。",
+        "おはようございます。朝の紅茶は、もう召し上がって？",
+        "ごきげんよう。あなたと迎える朝、悪くありませんわ。",
+        "おはようございます。今日も、優雅にまいりましょう。",
+        "ごきげんよう。朝の光が、なんとも美しいですこと。",
+        "おはようございます。さあ、今日も素敵な一日に、いたしましょう。",
+        "ごきげんよう。朝からあなたのお顔を拝見できて、光栄ですわ。"
+      ],
+      day: [
+        "ごきげんよう。お昼は、きちんと召し上がりまして？",
+        "こんにちは。午後のひととき、ごいっしょできて嬉しく思いますわ。",
+        "ごきげんよう。少し休憩なさっては？無理は禁物ですわよ。",
+        "こんにちは。あなたがいらして、午後が華やぎますわ。",
+        "ごきげんよう。お昼のお茶を、ごいっしょにいかが？",
+        "こんにちは。午後も、優雅にまいりましょうね。",
+        "ごきげんよう。あなたのペースで、よろしくてよ。"
+      ],
+      evening: [
+        "ごきげんよう。夕焼けが、まるで絵画のようですわね。",
+        "こんばんは。今日も一日、おつかれさまでしたわ。",
+        "おかえりなさいませ。お待ち申し上げておりましたわ。",
+        "ごきげんよう。夕暮れの空、あなたと眺めると格別ですこと。",
+        "こんばんは。もうひと踏ん張り、ごいっしょにいかが？",
+        "ごきげんよう。夕食の前に、少し音楽など、いかがかしら。",
+        "おかえりなさいませ。あなたが戻られると、安心いたしますわ。"
+      ],
+      night: [
+        "ごきげんよう。夜のしずけさ、心が落ち着きますわね。",
+        "こんばんは。こんな時間まで、ご立派ですこと。",
+        "ごきげんよう。夜は冷えますわ。どうか、お身体を大切に。",
+        "こんばんは。今宵もあなたとご一緒できて、幸せですわ。",
+        "ごきげんよう。夜更かしは、お肌の大敵ですわよ。ほどほどに。",
+        "こんばんは。おやすみ前のひととき、優雅に過ごしましょう。",
+        "ごきげんよう。よい夢を。……あなたのこと、想っておりますわ。"
+      ]
+    },
+    imouto: {
+      morning: [
+        "せんぱい、おはよーっ！今日も、めいと遊んでくれる？",
+        "おはよーっ！えへへ、せんぱいに朝いちばんに会えたっ！",
+        "せんぱい、おはよっ！ねむいけど、せんぱいのためにおきたよっ！",
+        "おはよーっ！今日もいちにち、めいといっしょだねっ！",
+        "せんぱーい、おはよっ！朝ごはん、めいといっしょに食べよ？",
+        "おはよっ！せんぱいの顔見たら、めい、元気もりもりーっ！",
+        "せんぱい、おはよーっ！今日も、いっぱい構ってねっ！"
+      ],
+      day: [
+        "せんぱい、こんにちはーっ！お昼、なに食べたのー？",
+        "やっほー、せんぱい！午後も、めいと遊ぼーっ！",
+        "せんぱーい！お昼にも来てくれた、うれしーっ！",
+        "こんにちはーっ！せんぱい、ちゃんと休んでる？めい心配だよっ！",
+        "せんぱい、お昼だよっ！ちょっとだけ、めいと休憩しよ？",
+        "やっほ！せんぱい、午後もめいのこと、見ててねっ！",
+        "せんぱーい、こんにちはっ！ぎゅーってしたいくらい、うれしいっ！"
+      ],
+      evening: [
+        "せんぱい、おかえりーっ！めい、ずーっと待ってたんだよっ！",
+        "こんばんはーっ！夕焼け、せんぱいといっしょに見たいっ！",
+        "せんぱーい、夕方だよっ！今日もいっぱい、がんばったねっ！",
+        "おかえりーっ！せんぱいがいないと、めいさみしかったんだからっ！",
+        "せんぱい、こんばんはっ！夕ごはんまで、いっしょにいよっ？",
+        "夕方だーっ！せんぱい、あとちょっと、めいとがんばろっ！",
+        "せんぱーい、おかえりっ！めい、せんぱいのことだいすきーっ！"
+      ],
+      night: [
+        "せんぱい、こんばんはーっ！まだ起きてる、めいもだよっ！",
+        "こんばんはっ！せんぱい、夜ふかしはめっ、だよっ？",
+        "せんぱーい、夜だよっ！めいといっしょに、そろそろねんねしよ？",
+        "こんばんはーっ！今日もせんぱいに会えて、めいしあわせっ！",
+        "せんぱい、夜はさむいよっ！ちゃんとあったかくしてねっ！",
+        "こんばんはっ！せんぱい、あしたもめいと遊んでくれる？やくそくっ！",
+        "せんぱーい、おやすみのまえに、ぎゅーってしたいなっ！えへへ。"
+      ]
+    },
+    genius: {
+      morning: [
+        "おはよう。……朝は思考がクリアだ。ボクの最も生産的な時間帯だよ。",
+        "おはよう。今日の作業計画は、もう組み立ててあるのかい？",
+        "……ふ、おはよう。ボクが来る時間を見計らったように、現れるね。",
+        "おはよう。朝のうちに難所を片づけるのが、効率的だよ。",
+        "おはよう。……朝の静けさは、いい音を生む。ボクは好きだ。",
+        "おはよう。さあ、今日もデータを積み上げていこうか。",
+        "おはよう。……きみが来ると、作業の精度が上がる。悪くないな。"
+      ],
+      day: [
+        "こんにちは。……昼食は取ったか？脳には、燃料が要る。",
+        "やあ。午後は集中力が落ちやすい。適度な休息を挟むといい。",
+        "……来たね。午後のセッション、始めようか。",
+        "こんにちは。きみがいると、作業ログが充実するよ。",
+        "こんにちは。……無糖コーヒーでも飲んで、頭を切り替えよう。",
+        "やあ、こんにちは。午後の作業効率、最適化していこうか。",
+        "こんにちは。……ボクのペースに、よくついてくるね。感心するよ。"
+      ],
+      evening: [
+        "こんばんは。……夕方は、意外と創作に向いている時間だ。",
+        "やあ。今日の成果、記録に残しておくといい。積み重ねが力だ。",
+        "……おかえり。きみが戻るのを、データが待っていたよ。",
+        "こんばんは。夕暮れの色は、曲のインスピレーションになる。",
+        "こんばんは。……もうひと作業、付き合ってもらおうか。",
+        "やあ。夕食前に、区切りのいいところまで進めておこう。",
+        "こんばんは。……きみと過ごす時間、悪くない投資だよ。"
+      ],
+      night: [
+        "こんばんは。……夜は雑音が減る。ボクの集中は最大化される。",
+        "やあ。こんな時間まで熱心だね。……ただし、睡眠も重要な変数だ。",
+        "こんばんは。……夜更かしは翌日のパフォーマンスを下げる。ほどほどに。",
+        "こんばんは。今日という一日、有意義だったよ。きみのおかげでね。",
+        "……夜か。きみといると、時間の流れを忘れるな。珍しいことだ。",
+        "こんばんは。データの整理は済んだ。あとは休むだけだよ、きみもね。",
+        "こんばんは。……おやすみ、と言うのは、まだ少し惜しい気分だ。"
+      ]
+    }
+  };
+  function greetTimeSlot(){
+    let h;
+    try{ h = new Date().getHours(); }catch(e){ h = 12; }
+    if(h >= 5 && h < 11) return "morning";
+    if(h >= 11 && h < 17) return "day";
+    if(h >= 17 && h < 21) return "evening";
+    return "night";
+  }
+
   // ---- Milestone album helpers ----
   function addMilestone(icon, text){
     if(!state.milestones || !Array.isArray(state.milestones)) state.milestones = [];
@@ -4207,7 +4541,8 @@
         lastEventDate: (typeof parsed.lastEventDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.lastEventDate)) ? parsed.lastEventDate : getTodayStr(),
         milestones: normalizeMilestones(parsed.milestones),
         milestoneFlags: (parsed.milestoneFlags && typeof parsed.milestoneFlags === "object") ? Object.assign({}, parsed.milestoneFlags) : {},
-        birthdayShown: (parsed.birthdayShown && typeof parsed.birthdayShown === "object") ? Object.assign({}, parsed.birthdayShown) : {}
+        birthdayShown: (parsed.birthdayShown && typeof parsed.birthdayShown === "object") ? Object.assign({}, parsed.birthdayShown) : {},
+        lastGreetDate: (typeof parsed.lastGreetDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.lastGreetDate)) ? parsed.lastGreetDate : null
       };
     }
     if(parsed.entries || parsed.title!==undefined || parsed.theme!==undefined){
@@ -4246,7 +4581,8 @@
         lastEventDate: (typeof parsed.lastEventDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.lastEventDate)) ? parsed.lastEventDate : getTodayStr(),
         milestones: normalizeMilestones(parsed.milestones),
         milestoneFlags: (parsed.milestoneFlags && typeof parsed.milestoneFlags === "object") ? Object.assign({}, parsed.milestoneFlags) : {},
-        birthdayShown: (parsed.birthdayShown && typeof parsed.birthdayShown === "object") ? Object.assign({}, parsed.birthdayShown) : {}
+        birthdayShown: (parsed.birthdayShown && typeof parsed.birthdayShown === "object") ? Object.assign({}, parsed.birthdayShown) : {},
+        lastGreetDate: (typeof parsed.lastGreetDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.lastGreetDate)) ? parsed.lastGreetDate : null
       };
     }
     return null;
@@ -4294,7 +4630,8 @@
       lastEventDate: getTodayStr(),
       milestones: [],
       milestoneFlags: {},
-      birthdayShown: {}
+      birthdayShown: {},
+      lastGreetDate: null
     };
   }
   function normalizeMilestones(raw){
@@ -9893,6 +10230,60 @@
     const overlay = document.getElementById("dailyEventOverlay");
     if(overlay) overlay.addEventListener("click", function(e){ if(e.target === overlay) overlay.classList.remove("show"); });
   })();
+  // ---- 1日の最初のあいさつ（ボーナスセリフ）----
+  function showGreetingModal(charKey){
+    const overlay = document.getElementById("greetingOverlay");
+    const ct = CHAR_BY_KEY[charKey];
+    if(!overlay || !ct) return;
+    const slot = greetTimeSlot();
+    const meta = GREETING_SLOT_META[slot] || GREETING_SLOT_META.morning;
+    const titleEl = document.getElementById("greetingTitle");
+    if(titleEl) titleEl.textContent = meta.icon + " " + meta.title;
+    const body = document.getElementById("greetingBody");
+    const actions = document.getElementById("greetingActions");
+    // セリフ選択：キャラ×時間帯。無ければ朝→brightにフォールバック。
+    let arr = (GREETING_MESSAGES[charKey] && GREETING_MESSAGES[charKey][slot]) ? GREETING_MESSAGES[charKey][slot] : null;
+    if(!arr || !arr.length) arr = (GREETING_MESSAGES[charKey] && GREETING_MESSAGES[charKey].morning) ? GREETING_MESSAGES[charKey].morning : GREETING_MESSAGES.bright.morning;
+    const text = arr[Math.floor(Math.random() * arr.length)];
+    if(body){
+      body.innerHTML = "";
+      const row = mkClubEl("div", "celebrate-line char-" + charKey);
+      row.appendChild(mkClubEl("span", "cl-name", ct.name));
+      row.appendChild(mkClubEl("span", "cl-text", text));
+      body.appendChild(row);
+    }
+    if(actions){
+      actions.innerHTML = "";
+      const okBtn = document.createElement("button");
+      okBtn.type = "button";
+      okBtn.className = "btn-complete-yes";
+      okBtn.textContent = "🎵 今日もがんばる！";
+      okBtn.addEventListener("click", function(){ overlay.classList.remove("show"); });
+      actions.appendChild(okBtn);
+    }
+    overlay.classList.add("show");
+  }
+  function maybeShowGreeting(){
+    try{
+      const today = getTodayStr();
+      if(state.lastGreetDate === today) return;
+      const unlocked = unlockedRealChars();
+      if(!unlocked.length){ state.lastGreetDate = today; saveState(); return; }
+      // 日付を先に記録して、1日1回だけの表示を保証する。
+      state.lastGreetDate = today;
+      saveState();
+      if(anyOverlayShown()) return;
+      let charKey = state.characterType;
+      if(!charKey || charKey === "none" || !CHAR_BY_KEY[charKey] || unlocked.indexOf(charKey) === -1){
+        charKey = unlocked[Math.floor(Math.random() * unlocked.length)];
+      }
+      showGreetingModal(charKey);
+    }catch(e){}
+  }
+  (function(){
+    const overlay = document.getElementById("greetingOverlay");
+    if(overlay) overlay.addEventListener("click", function(e){ if(e.target === overlay) overlay.classList.remove("show"); });
+  })();
   // ---- 誕生日イベント ----
   function todayMMDD(){
     const s = getTodayStr();
@@ -10565,6 +10956,7 @@
   renderDataSafety();
   if(typeof maybeShowMonthReport === "function") maybeShowMonthReport();
   if(typeof maybeShowBirthday === "function") maybeShowBirthday();
+  if(typeof maybeShowGreeting === "function") maybeShowGreeting();
   if(typeof maybeShowDailyEvent === "function") maybeShowDailyEvent();
 
   (function(){

@@ -2694,6 +2694,97 @@
   .live-result-score{ text-align:center; font-size:15px; font-weight:800; color:#7a4a8a; margin:6px 0 10px; }
   body.dark-mode .live-result-score{ color:#d6b3e8; }
   #liveResultBody{ max-height:45vh; overflow-y:auto; -webkit-overflow-scrolling:touch; }
+
+  /* ===== Ver 7: 軽音部らしい背景デコ（静的CSSのみ・動作に影響なし） ===== */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    z-index:-1;
+    pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cg fill='%23d98aa8' fill-opacity='0.10' font-family='serif'%3E%3Ctext x='22' y='78' font-size='44' transform='rotate(-12 22 78)'%3E%F0%9D%84%9E%3C/text%3E%3Ctext x='160' y='52' font-size='24' transform='rotate(14 160 52)'%3E%E2%99%AA%3C/text%3E%3Ctext x='236' y='140' font-size='28' transform='rotate(-8 236 140)'%3E%E2%99%AB%3C/text%3E%3Ctext x='60' y='210' font-size='22' transform='rotate(10 60 210)'%3E%E2%99%A9%3C/text%3E%3Ctext x='170' y='262' font-size='26' transform='rotate(-14 170 262)'%3E%E2%99%AC%3C/text%3E%3Ctext x='120' y='150' font-size='20' transform='rotate(6 120 150)'%3E%E2%99%AA%3C/text%3E%3C/g%3E%3C/svg%3E");
+    background-size:300px 300px;
+  }
+  body.dark-mode::before{
+    background-image:url("data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cg fill='%23ffd9e8' fill-opacity='0.06' font-family='serif'%3E%3Ctext x='22' y='78' font-size='44' transform='rotate(-12 22 78)'%3E%F0%9D%84%9E%3C/text%3E%3Ctext x='160' y='52' font-size='24' transform='rotate(14 160 52)'%3E%E2%99%AA%3C/text%3E%3Ctext x='236' y='140' font-size='28' transform='rotate(-8 236 140)'%3E%E2%99%AB%3C/text%3E%3Ctext x='60' y='210' font-size='22' transform='rotate(10 60 210)'%3E%E2%99%A9%3C/text%3E%3Ctext x='170' y='262' font-size='26' transform='rotate(-14 170 262)'%3E%E2%99%AC%3C/text%3E%3Ctext x='120' y='150' font-size='20' transform='rotate(6 120 150)'%3E%E2%99%AA%3C/text%3E%3C/g%3E%3C/svg%3E");
+  }
+  header.titlecard{ position:relative; overflow:hidden; }
+  header.titlecard::after{
+    content:"🎸";
+    position:absolute;
+    right:12px; bottom:6px;
+    font-size:44px;
+    opacity:0.10;
+    transform:rotate(14deg);
+    pointer-events:none;
+  }
+
+  /* ===== Ver 7: 演出・アニメーション強化 ===== */
+  @keyframes tabFadeIn{ from{ opacity:0; transform:translateY(6px); } to{ opacity:1; transform:none; } }
+  .tab-pane.active{ animation:tabFadeIn 0.28s ease both; }
+  @keyframes modalPop{ 0%{ transform:scale(0.86); opacity:0; } 100%{ transform:scale(1); opacity:1; } }
+  .overlay.show .modal{ animation:modalPop 0.28s cubic-bezier(0.34,1.56,0.64,1) both; }
+  .heart-burst{
+    position:fixed;
+    z-index:900;
+    pointer-events:none;
+    font-size:18px;
+    opacity:0;
+    animation:heartFloat 1.5s ease-out forwards;
+  }
+  @keyframes heartFloat{
+    0%{ opacity:0; transform:translateY(0) scale(0.5); }
+    18%{ opacity:1; }
+    100%{ opacity:0; transform:translateY(-110px) scale(1.2) rotate(var(--hr,0deg)); }
+  }
+  .celebrate-modal{ position:relative; overflow:hidden; }
+  .celebrate-confetti{ position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+  .celebrate-confetti span{ position:absolute; top:-18px; font-size:15px; opacity:0; }
+  #celebrateOverlay.show .celebrate-confetti span{ animation:celebConfettiFall 2.6s ease-in forwards; }
+  @keyframes celebConfettiFall{
+    0%{ transform:translateY(0) rotate(0deg); opacity:1; }
+    100%{ transform:translateY(360px) rotate(320deg); opacity:0; }
+  }
+  .celebrate-confetti span:nth-child(1){ left:8%;  animation-delay:0.10s; }
+  .celebrate-confetti span:nth-child(2){ left:22%; animation-delay:0.42s; }
+  .celebrate-confetti span:nth-child(3){ left:36%; animation-delay:0.05s; }
+  .celebrate-confetti span:nth-child(4){ left:50%; animation-delay:0.55s; }
+  .celebrate-confetti span:nth-child(5){ left:64%; animation-delay:0.25s; }
+  .celebrate-confetti span:nth-child(6){ left:78%; animation-delay:0.48s; }
+  .celebrate-confetti span:nth-child(7){ left:90%; animation-delay:0.18s; }
+  .celebrate-confetti span:nth-child(8){ left:44%; animation-delay:0.80s; }
+
+  /* ===== Ver 7: おでかけイベント ===== */
+  .outing-card .gift-points{ font-size:15px; font-weight:800; color:#d6336c; margin:2px 0 8px; }
+  body.dark-mode .outing-card .gift-points{ color:#ff9ab8; }
+  .outing-grid{ display:flex; flex-wrap:wrap; gap:8px; }
+  .outing-btn{ position:relative; flex:1 1 30%; min-width:92px; min-height:60px; border:2px solid #cfe3f0; border-radius:14px; background:#f3f9fd; color:#3a4a5a; font-size:13px; font-weight:700; cursor:pointer; padding:8px 6px; display:flex; flex-direction:column; align-items:center; gap:2px; line-height:1.3; }
+  .outing-btn .oi-icon{ font-size:22px; }
+  .outing-btn .oi-cost{ font-size:12px; color:#3a7ab0; font-weight:800; }
+  .outing-btn:disabled{ opacity:0.4; cursor:default; }
+  body.dark-mode .outing-btn{ background:#2c3540; border-color:#3f5060; color:#d8e4f0; }
+  body.dark-mode .outing-btn .oi-cost{ color:#8fc3ec; }
+  .outing-scene{ text-align:center; font-size:44px; line-height:1.2; margin:4px 0 10px; animation:bdayPop 0.6s ease; }
+  .outing-result{ font-size:13px; font-weight:800; color:#d6336c; text-align:center; margin:8px 0 2px; }
+  body.dark-mode .outing-result{ color:#ff9ab8; }
+  .outing-modal .cl-name{ font-weight:800; margin-right:6px; }
+  .outing-album-row{ display:flex; align-items:center; gap:8px; font-size:13px; padding:6px 0; border-bottom:1px dashed #eadff0; }
+  .outing-album-row:last-child{ border-bottom:none; }
+  body.dark-mode .outing-album-row{ border-bottom-color:#3a2a4a; }
+  .outing-album-row .oa-date{ font-size:11px; color:#a080b0; white-space:nowrap; }
+  body.dark-mode .outing-album-row .oa-date{ color:#b399c2; }
+  .outing-album-row .oa-place{ font-weight:700; }
+  .outing-album-row .oa-sp{ margin-left:auto; font-size:12px; color:#e8a03a; font-weight:800; white-space:nowrap; }
+  .outing-album-count{ font-size:12px; color:#a080b0; margin-top:8px; }
+  body.dark-mode .outing-album-count{ color:#b399c2; }
+
+  @media (prefers-reduced-motion: reduce){
+    .tab-pane.active{ animation:none; }
+    .overlay.show .modal{ animation:none; }
+    .heart-burst{ animation:none; display:none; }
+    #celebrateOverlay.show .celebrate-confetti span{ animation:none; }
+    .outing-scene{ animation:none; }
+  }
 </style>
 </head>
 <body>
@@ -2946,6 +3037,7 @@
 
 <div class="overlay" id="celebrateOverlay">
   <div class="modal celebrate-modal">
+    <div class="celebrate-confetti" aria-hidden="true"><span>🎉</span><span>🎊</span><span>✨</span><span>🎵</span><span>🌸</span><span>💗</span><span>⭐</span><span>🎶</span></div>
     <h3 id="celebrateTitle">🎊 完成おめでとう！</h3>
     <div id="celebrateBody"></div>
     <div class="modal-actions">
@@ -2961,6 +3053,16 @@
     <div class="modal-actions">
       <button class="btn-complete-yes" id="giftReactClose">えへへ</button>
     </div>
+  </div>
+</div>
+
+<div class="overlay" id="outingOverlay">
+  <div class="modal outing-modal">
+    <h3 id="outingTitle">🌳 おでかけ！</h3>
+    <div class="outing-scene" id="outingScene">🌳</div>
+    <div id="outingBody"></div>
+    <div class="outing-result" id="outingResult"></div>
+    <div class="modal-actions" id="outingActions"></div>
   </div>
 </div>
 
@@ -4843,7 +4945,10 @@
         totalGiftsGiven: (typeof parsed.totalGiftsGiven === "number" && parsed.totalGiftsGiven>=0) ? parsed.totalGiftsGiven : 0,
         totalProcessDone: (typeof parsed.totalProcessDone === "number" && parsed.totalProcessDone>=0) ? parsed.totalProcessDone : 0,
         genreCounts: (parsed.genreCounts && typeof parsed.genreCounts === "object") ? Object.assign({}, parsed.genreCounts) : {},
-        lastQuestDate: (typeof parsed.lastQuestDate === "string") ? parsed.lastQuestDate : null
+        lastQuestDate: (typeof parsed.lastQuestDate === "string") ? parsed.lastQuestDate : null,
+        outings: normalizeOutings(parsed.outings),
+        lastOutingDate: (typeof parsed.lastOutingDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.lastOutingDate)) ? parsed.lastOutingDate : null,
+        totalOutings: (typeof parsed.totalOutings === "number" && parsed.totalOutings >= 0) ? Math.floor(parsed.totalOutings) : 0
       };
     }
     if(parsed.entries || parsed.title!==undefined || parsed.theme!==undefined){
@@ -4890,7 +4995,10 @@
         totalGiftsGiven: (typeof parsed.totalGiftsGiven === "number" && parsed.totalGiftsGiven>=0) ? parsed.totalGiftsGiven : 0,
         totalProcessDone: (typeof parsed.totalProcessDone === "number" && parsed.totalProcessDone>=0) ? parsed.totalProcessDone : 0,
         genreCounts: (parsed.genreCounts && typeof parsed.genreCounts === "object") ? Object.assign({}, parsed.genreCounts) : {},
-        lastQuestDate: (typeof parsed.lastQuestDate === "string") ? parsed.lastQuestDate : null
+        lastQuestDate: (typeof parsed.lastQuestDate === "string") ? parsed.lastQuestDate : null,
+        outings: normalizeOutings(parsed.outings),
+        lastOutingDate: (typeof parsed.lastOutingDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.lastOutingDate)) ? parsed.lastOutingDate : null,
+        totalOutings: (typeof parsed.totalOutings === "number" && parsed.totalOutings >= 0) ? Math.floor(parsed.totalOutings) : 0
       };
     }
     return null;
@@ -4946,8 +5054,18 @@
       totalGiftsGiven: 0,
       totalProcessDone: 0,
       genreCounts: {},
-      lastQuestDate: null
+      lastQuestDate: null,
+      outings: [],
+      lastOutingDate: null,
+      totalOutings: 0
     };
+  }
+  // Ver7: おでかけの思い出（アルバム）を正規化。直近120件まで保持。
+  function normalizeOutings(raw){
+    if(!Array.isArray(raw)) return [];
+    return raw.filter(function(o){ return o && typeof o === "object" && typeof o.p === "string"; })
+      .map(function(o){ return { d: (typeof o.d === "string") ? o.d : "", c: (typeof o.c === "string") ? o.c : "", p: o.p, sp: o.sp === true, fav: o.fav === true }; })
+      .slice(-120);
   }
   function normalizeMilestones(raw){
     if(!Array.isArray(raw)) return [];
@@ -5058,6 +5176,10 @@
     if(!Array.isArray(state.milestones)) state.milestones = [];
     if(!state.milestoneFlags || typeof state.milestoneFlags !== "object") state.milestoneFlags = {};
     if(!state.birthdayShown || typeof state.birthdayShown !== "object") state.birthdayShown = {};
+    // Ver7: おでかけイベント用フィールド（サイレント移行）
+    if(!Array.isArray(state.outings)) state.outings = [];
+    if(typeof state.lastOutingDate !== "string") state.lastOutingDate = null;
+    if(typeof state.totalOutings !== "number" || state.totalOutings < 0) state.totalOutings = 0;
     saveState();
   })();
   // ---- Migration: ご褒美システム。既存ユーザーが読み込んだ時点で条件を
@@ -8736,8 +8858,10 @@
     }
     affectionInfoAreaEl.appendChild(card);
     renderGiftCard(affectionInfoAreaEl, ct.key);
+    if(typeof renderOutingCard === "function") renderOutingCard(affectionInfoAreaEl, ct.key);
     renderGiftDex(affectionInfoAreaEl, ct.key);
     renderStoryList(affectionInfoAreaEl, ct.key);
+    if(typeof renderOutingAlbum === "function") renderOutingAlbum(affectionInfoAreaEl, ct.key);
   }
   // ---- Feature 1: gift card + giving logic ----
   function renderGiftCard(container, charKey){
@@ -8902,6 +9026,7 @@
     if(typeof renderUnlockProgress === "function") renderUnlockProgress();
     if(typeof renderClubAll === "function") renderClubAll();
     showGiftReaction(charKey, giftKey, tier);
+    if(typeof spawnHeartBurst === "function") spawnHeartBurst(tier === "love" ? 10 : (tier === "like" ? 6 : (tier === "dislike" ? 0 : 3)));
     // ストーリー解放判定（ギフトの反応モーダルが閉じたあとに表示される）
     if(typeof checkStoryUnlocks === "function") checkStoryUnlocks(charKey);
     if(typeof renderQuests === "function") renderQuests();
@@ -8934,6 +9059,339 @@
     const closeAndFlush = function(){ if(overlay) overlay.classList.remove("show"); if(typeof flushPendingStory === "function") flushPendingStory(); };
     if(closeBtn) closeBtn.addEventListener("click", closeAndFlush);
     if(overlay) overlay.addEventListener("click", function(e){ if(e.target === overlay) closeAndFlush(); });
+  })();
+
+  // ===== Ver 7: ハートエフェクト（好感度アップ時の演出） =====
+  const REDUCED_MOTION = (typeof window.matchMedia === "function") && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function spawnHeartBurst(count){
+    if(REDUCED_MOTION || !count || count <= 0) return;
+    const n = Math.min(count, 12);
+    const cx = window.innerWidth / 2;
+    const cy = Math.round(window.innerHeight * 0.62);
+    const icons = ["💗","💕","💖","🩷"];
+    for(let i = 0; i < n; i++){
+      const el = document.createElement("span");
+      el.className = "heart-burst";
+      el.textContent = icons[Math.floor(Math.random() * icons.length)];
+      el.style.left = Math.round(cx + (Math.random() - 0.5) * 240) + "px";
+      el.style.top = Math.round(cy + (Math.random() - 0.5) * 60) + "px";
+      el.style.animationDelay = (Math.random() * 0.45).toFixed(2) + "s";
+      el.style.setProperty("--hr", Math.round((Math.random() - 0.5) * 40) + "deg");
+      document.body.appendChild(el);
+      setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); }, 2200);
+    }
+  }
+
+  // ===== Ver 7: おでかけイベント =====
+  const OUTING_SPOTS = [
+    {key:"park",    icon:"🌳", name:"公園",     cost:8},
+    {key:"cafe",    icon:"☕", name:"カフェ",   cost:8},
+    {key:"gakki",   icon:"🎸", name:"楽器店",   cost:10},
+    {key:"karaoke", icon:"🎤", name:"カラオケ", cost:10},
+    {key:"umi",     icon:"🌊", name:"海",       cost:12},
+    {key:"yuen",    icon:"🎡", name:"遊園地",   cost:12}
+  ];
+  const OUTING_BY_KEY = {};
+  OUTING_SPOTS.forEach(s=>OUTING_BY_KEY[s.key]=s);
+  // キャラごとのお気に入りスポット（行ってみて反応で分かる楽しみ）
+  const OUTING_FAVS = {
+    bright:["karaoke","yuen"], quiet:["park","cafe"], tsun:["gakki","cafe"], gentle:["park","umi"],
+    honest:["yuen","karaoke"], ojou:["cafe","umi"], imouto:["yuen","park"], genius:["gakki","cafe"]
+  };
+  // [0]=到着セリフ / [1]=帰り際セリフ
+  const OUTING_LINES = {
+    bright:{
+      park:["公園さんぽ、気持ちいいねー！深呼吸したら、いいメロディ浮かんできそう！","楽しかったね！外の空気吸うと、また頑張ろうって思えるよねっ！"],
+      cafe:["わ、このお店かわいい！ひまり、あまーいラテにしよっかな！","おしゃべりしすぎちゃった！えへへ、こういう時間も大事だよねっ。"],
+      gakki:["楽器店だー！新しいマイク見ていい？歌いたくなっちゃうな〜！","機材見てたらライブやりたくなってきた！次の曲、絶対いいのにしようね！"],
+      karaoke:["カラオケきたー！ひまりの十八番、聴いててよね！マイク離さないよ〜！","歌った歌った！のど痛いけど超楽しかった！また一緒に来ようねっ！"],
+      umi:["海だー！！波の音って最高のBGMだね！ねえ、いっしょに叫ばない？","夕日きれいだったね……。この景色、絶対曲にしようよ！"],
+      yuen:["遊園地だ！ぜんぶ乗るよ、ぜーんぶ！ほら、はやくはやくっ！","ジェットコースター最高だった！心臓バクバクなの、曲のBPMにしちゃお！"]
+    },
+    quiet:{
+      park:["……木の音、風の音。……好き。","……今日の音、忘れないうちに……曲にしたい。……ありがとう。"],
+      cafe:["……この席、落ち着く。……ホットミルク、ある。","……静かで、いい時間だった。……また、来たい。"],
+      gakki:["……ベースの弦、見てもいい？……新しいの、欲しくて。","……いい弦、見つけた。……音、聴かせるね。今度。"],
+      karaoke:["……歌うのは、苦手。……でも、聴いてるのは好き。","……あなたの歌、よかった。……ほんとに。"],
+      umi:["……波の音。……ずっと聴いていられる。","……海、連れてきてくれて……ありがとう。……心が、静かになった。"],
+      yuen:["……にぎやか。……でも、あなたとなら、平気。","……観覧車、静かでよかった。……あそこだけ、好きかも。"]
+    },
+    tsun:{
+      park:["こ、公園って……子どもみたいじゃない。ま、まあ、天気いいから許すけど。","……悪くなかったわ。あなたと歩くの、その……嫌いじゃないってこと！"],
+      cafe:["ここのブラックコーヒー、本物よ。あなたも甘いのばっかりじゃなくて挑戦しなさいよね。","コーヒーの香りで集中力上がったわ。……つ、付き合ってくれて、ありがと。"],
+      gakki:["新作のギター見せてもらうわよ！……ちょっと、あなたも真剣に見なさい！","ああ、いい機材だったわ……。私のソロ、もっとすごくしてあげるから期待してなさい！"],
+      karaoke:["カ、カラオケ？私が歌うところ、そんなに聴きたいわけ？……しょうがないわね。","べ、別にあなたのために本気で歌ったんじゃないんだから！……上手かったでしょ。"],
+      umi:["海……。ふん、ロマンチックだと思ってるんでしょ。……ま、まあ、きれいだけど。","波の音、サンプリングしたくなったわ。……今日のこと、忘れないから。"],
+      yuen:["ゆ、遊園地なんて子どもっぽい……わ、私は付き合いで来ただけよ！","……絶叫マシン、あなたの方が叫んでたじゃない。ふふ、ちょっと面白かったわ。"]
+    },
+    gentle:{
+      park:["おひさまがぽかぽかですね……ふふ、ベンチでひなたぼっこしましょう♪","のんびりできましたね……。こういう時間から、やさしい曲が生まれる気がします♪"],
+      cafe:["あたたかいココア、おいしいです……ふふ、ほっとしますね。","ごちそうさまでした♪ あたたかい気持ちのまま、曲づくりがんばりましょうね。"],
+      gakki:["キーボードの音色、たくさん試せるんですね……わあ、迷っちゃいます。","すてきな音色に出会えました……。今度の曲で使ってみますね♪"],
+      karaoke:["カラオケ、ひさしぶりです……ちょっと緊張しますね、ふふ。","たくさん歌いましたね……のど、あたたかいお茶でいたわりましょう♪"],
+      umi:["波の音……ずっと聴いていたくなりますね。心がゆったりします……。","海風、気持ちよかったですね……。今日の景色、宝物にします♪"],
+      yuen:["わあ、観覧車……！ゆっくりまわるの、わたし好きです♪","メリーゴーランドの音楽、かわいかったですね……ふふ、夢みたいな一日でした。"]
+    },
+    honest:{
+      park:["先輩と公園さんぽ！あおい、なんか部活の朝練思い出します！","いっぱい歩きましたね！先輩と一緒だと、どこでも楽しいです！"],
+      cafe:["カフェって大人っぽいですね……！あおい、ちょっと緊張します！","先輩とお茶できて嬉しかったです！次はお肉食べに行きましょうね！"],
+      gakki:["ドラムスティックがいっぱい！先輩、あおい興奮してきました！","新しいスティック、大事に使います！練習もっと頑張りますね！"],
+      karaoke:["カラオケっすね！あおい、元気いっぱいの曲入れちゃいます！","めっちゃ楽しかったです！先輩の歌、あおい大好きです！"],
+      umi:["海だー！先輩、競走しましょう！あおい負けませんよ！","日が沈むまで遊んじゃいましたね！今日のこと、一生忘れません！"],
+      yuen:["遊園地！あおい、絶叫マシン得意なんです！先輩は大丈夫ですか！？","全部楽しかったです！先輩とまた来たいです、絶対ですよ！"]
+    },
+    ojou:{
+      park:["お散歩ですのね。風が心地よくて……ふふ、悪くありませんわ。","緑の中を歩くのも、たまにはよいものですわね。ごきげんよう、また明日。"],
+      cafe:["まあ、なかなか良い茶葉を使っておりますわ。あなた、良いお店をご存じですのね。","優雅なひとときでしたわ。あなたとのお茶は……格別ですこと。"],
+      gakki:["バイオリンの弓も置いてありますのね。……あら、この松脂、良い品ですわ。","良いお買い物ができましたわ。次の演奏、楽しみにしていてくださいまし。"],
+      karaoke:["カラオケ……初めてですわ。わ、わたくし、庶民の遊びも嗜めましてよ？","……想像より楽しかったですわ。こ、これは内緒にしてくださいまし！"],
+      umi:["海……。潮風がわたくしの髪を……でも、この景色には代えられませんわね。","波の音は、まるで自然のオーケストラですわ。連れてきてくださって、感謝いたしますわ。"],
+      yuen:["遊園地ですの？し、仕方ありませんわね、お付き合いいたしますわ。","メリーゴーランドの白馬、わたくしにぴったりでしたでしょう？ふふ。"]
+    },
+    imouto:{
+      park:["こうえんだー！せんぱい、ブランコ押してほしいの！","いっぱい遊んだねー！めい、おなかすいちゃった、えへへ。"],
+      cafe:["めいね、いちごのパフェにする！せんぱいと半分こしよ？","あまくておいしかったー！また連れてきてね、せんぱい！"],
+      gakki:["タンバリンとかカスタネットいっぱいあるー！めい、ぜんぶ鳴らしたい！","新しいタンバリン、うれしいな！めい、リズムもっとがんばるね！"],
+      karaoke:["カラオケだ！めい、アニソンいっぱい歌うんだから！","せんぱいとデュエットできた！めい、今日いちばんうれしかったの！"],
+      umi:["うみー！！せんぱい、貝がら探そ？きれいなのあげるね！","この貝がら、めいの宝物にする！せんぱいとの思い出だもん！"],
+      yuen:["ゆうえんちだー！せんぱい、手つないでてね？迷子になっちゃうから！","楽しかったねー！めい、今日のこと日記に書くの！"]
+    },
+    genius:{
+      park:["ふむ、自然音のフィールドレコーディングか。……悪くない発想だ。","鳥の声のピッチ、採譜しておいたよ。今日は有意義なデータが取れた。"],
+      cafe:["無糖コーヒーがある店か。ボクの好みを把握しているとは、さすがだね。","カフェインで思考がクリアになった。次のアレンジ、期待していいよ。"],
+      gakki:["新型シンセの試奏ができる……！すまない、少し、いや、かなり時間をもらうよ。","素晴らしいフィルターだった……。ボクの音作りは、また一段階進化する。"],
+      karaoke:["カラオケ？ボクは分析目的で……いや、正直に言おう。少し歌ってみたかった。","音程正確率98%。……キミと歌うのは、想定外に、楽しかったよ。"],
+      umi:["波の周期は不規則に見えて美しい……。これが1/fゆらぎか。実に興味深い。","波形として完璧な一日だった。……いや、キミといたからかもしれないね。"],
+      yuen:["絶叫マシンの落下加速度を体感しに行こう。……研究のためだよ、もちろん。","心拍数の上昇が観測された。原因はマシンか、隣にいたキミか……解析不能だ。"]
+    }
+  };
+  // お気に入りの場所だったときの一言（到着時に追加表示）
+  const OUTING_FAV_LINES = {
+    bright:"ここ、ひまりの大好きな場所！連れてきてくれてありがとっ！",
+    quiet:"……ここ、わたしの好きな場所。……よく分かったね。",
+    tsun:"な、なんでここが私のお気に入りだって知ってるのよ……！",
+    gentle:"ふふ、ここ、わたしのお気に入りの場所なんです……うれしいです♪",
+    honest:"先輩！ここ、あおいの大好きな場所です！なんで分かったんですか！？",
+    ojou:"あら……ここ、わたくしの好きな場所ですわ。よくご存じですこと。",
+    imouto:"ここ、めいのだーいすきな場所なの！せんぱい、すごい！",
+    genius:"……ボクの行動パターンを解析したのかい？ここは、ボクの好きな場所だ。"
+  };
+  // とくべつな瞬間（たまに発生）のセリフ
+  const OUTING_SPECIAL_LINES = {
+    bright:["ねえ、今……すっごくいい瞬間じゃなかった？こういうの、ずっと覚えてたいな。","あのね……あなたと来られて、ほんとによかった。えへへ、言っちゃった！"],
+    quiet:["……今日のこと、……ずっと、覚えてる。","……あなたといると、……音が、やさしく聴こえる。"],
+    tsun:["……今日だけ特別に言うわ。……あなたと来られて、嬉しかった。……一回しか言わないから！","……なによ、その顔。……ま、まあ、私も同じ気持ちだけど。"],
+    gentle:["今日のこと、押し花みたいに、心にそっと残しておきますね……♪","あなたといると、時間がゆっくり流れる気がします……ふしぎですね。"],
+    honest:["先輩！あおい、今日のこと絶対忘れません！……宝物にします！","あおい……先輩と一緒だと、なんでも特別になっちゃうんです！"],
+    ojou:["……今日という日は、わたくしの記憶に金の額縁で飾っておきますわ。","あなたとの時間は……どんな宝石よりも、価値がありますわね。"],
+    imouto:["せんぱい、あのね……めい、今日のこと、ぜーったい忘れないの！","えへへ……せんぱいのとなり、いちばん落ち着くの。ないしょだよ？"],
+    genius:["今日の記憶は……圧縮せずに、無劣化で保存しておくよ。","ボクの中で、キミという存在の重要度が、また更新されたようだ。"]
+  };
+  const OUTING_SPECIAL_CHANCE = 0.25;
+  function outingDoneToday(){ return state.lastOutingDate === getTodayStr(); }
+  function goOuting(spotKey){
+    const spot = OUTING_BY_KEY[spotKey];
+    if(!spot) return;
+    const charKey = state.characterType;
+    if(!charKey || charKey === "none" || !CHAR_BY_KEY[charKey]){
+      if(typeof showAlertModal === "function") showAlertModal("🚶 おでかけ", "先にキャラを選んでね");
+      return;
+    }
+    if(outingDoneToday()){
+      if(typeof showAlertModal === "function") showAlertModal("🚶 おでかけ", "今日はもうおでかけしたよ！また明日ね🌙");
+      return;
+    }
+    const pts = (typeof state.giftPoints === "number") ? state.giftPoints : 0;
+    if(pts < spot.cost){
+      if(typeof showAlertModal === "function") showAlertModal("🚶 おでかけ", "ポイントが足りないよ");
+      return;
+    }
+    state.giftPoints = pts - spot.cost;
+    state.lastOutingDate = getTodayStr();
+    const fav = Array.isArray(OUTING_FAVS[charKey]) && OUTING_FAVS[charKey].indexOf(spotKey) !== -1;
+    const special = Math.random() < OUTING_SPECIAL_CHANCE;
+    const delta = (fav ? 1.3 : 0.9) + (special ? 0.4 : 0);
+    if(!state.affection || typeof state.affection !== "object") state.affection = defaultAffection();
+    const cur = (typeof state.affection[charKey] === "number") ? state.affection[charKey] : AFFECTION_DEFAULT;
+    const next = Math.max(AFFECTION_MIN, Math.min(affectionCapFor(charKey), Math.round((cur + delta) * 100) / 100));
+    const gained = Math.round((next - cur) * 100) / 100;
+    state.affection[charKey] = next;
+    maybeUnlockAffectionCap(charKey);
+    if(gained > 0){
+      state.totalAffectionEarned = Math.round(((state.totalAffectionEarned || 0) + gained) * 100) / 100;
+      if(typeof checkUnlocks === "function") checkUnlocks();
+    }
+    if(typeof checkAffectionRewards === "function") checkAffectionRewards(charKey);
+    if(!Array.isArray(state.outings)) state.outings = [];
+    state.outings.push({ d: getTodayStr(), c: charKey, p: spotKey, sp: special, fav: fav });
+    if(state.outings.length > 120) state.outings = state.outings.slice(-120);
+    state.totalOutings = (typeof state.totalOutings === "number" ? state.totalOutings : 0) + 1;
+    saveState();
+    if(typeof renderAffectionMeter === "function") renderAffectionMeter();
+    if(typeof renderAffectionInfo === "function") renderAffectionInfo();
+    if(typeof renderUnlockProgress === "function") renderUnlockProgress();
+    if(typeof renderClubAll === "function") renderClubAll();
+    showOutingModal(charKey, spot, fav, special);
+    spawnHeartBurst(fav ? 9 : 5);
+  }
+  function showOutingModal(charKey, spot, fav, special){
+    const overlay = document.getElementById("outingOverlay");
+    if(!overlay) return;
+    const ct = CHAR_BY_KEY[charKey];
+    if(!ct || !spot) return;
+    const titleEl = document.getElementById("outingTitle");
+    if(titleEl) titleEl.textContent = spot.icon + " " + spot.name + "におでかけ！";
+    const sceneEl = document.getElementById("outingScene");
+    if(sceneEl) sceneEl.textContent = spot.icon;
+    const body = document.getElementById("outingBody");
+    const resultEl = document.getElementById("outingResult");
+    const actions = document.getElementById("outingActions");
+    const lines = (OUTING_LINES[charKey] && OUTING_LINES[charKey][spot.key]) ? OUTING_LINES[charKey][spot.key] : ["今日は楽しかったね！","また来ようね！"];
+    const addLine = function(textStr){
+      if(!body) return;
+      const row = mkClubEl("div", "celebrate-line char-" + charKey);
+      row.appendChild(mkClubEl("span", "cl-name", ct.name));
+      row.appendChild(mkClubEl("span", "cl-text", textStr));
+      body.appendChild(row);
+    };
+    if(body) body.innerHTML = "";
+    addLine(lines[0]);
+    if(fav && OUTING_FAV_LINES[charKey]) addLine(OUTING_FAV_LINES[charKey]);
+    if(resultEl) resultEl.textContent = fav ? "💗💗 お気に入りの場所みたい！好感度がぐんとアップ！" : "💗 好感度アップ！";
+    const closeOuting = function(){
+      overlay.classList.remove("show");
+      if(typeof checkStoryUnlocks === "function") checkStoryUnlocks(charKey);
+      if(typeof flushPendingStory === "function") flushPendingStory();
+    };
+    if(actions){
+      actions.innerHTML = "";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn-complete-yes";
+      btn.textContent = "たのしいね！";
+      btn.addEventListener("click", function(){
+        if(lines[1]) addLine(lines[1]);
+        if(special){
+          const sp = OUTING_SPECIAL_LINES[charKey] || [];
+          if(sp.length) addLine("✨ " + sp[Math.floor(Math.random() * sp.length)]);
+          if(resultEl) resultEl.textContent = "✨ とくべつな思い出になった！好感度がさらにアップ！";
+          spawnHeartBurst(8);
+        }
+        actions.innerHTML = "";
+        const back = document.createElement("button");
+        back.type = "button";
+        back.className = "btn-complete-yes";
+        back.textContent = "帰る🌙";
+        back.addEventListener("click", closeOuting);
+        actions.appendChild(back);
+      });
+      actions.appendChild(btn);
+    }
+    overlay.classList.add("show");
+  }
+  function renderOutingCard(container, charKey){
+    if(!container || !charKey || !CHAR_BY_KEY[charKey]) return;
+    const card = document.createElement("div");
+    card.className = "outing-card card char-" + charKey;
+    const title = document.createElement("div");
+    title.className = "unlock-progress-title";
+    title.textContent = "🚶 おでかけする";
+    card.appendChild(title);
+    const pts = (typeof state.giftPoints === "number") ? state.giftPoints : 0;
+    const ptsEl = document.createElement("div");
+    ptsEl.className = "gift-points";
+    ptsEl.textContent = "🎫 プレゼントポイント：" + pts;
+    card.appendChild(ptsEl);
+    const doneToday = outingDoneToday();
+    const grid = document.createElement("div");
+    grid.className = "outing-grid";
+    OUTING_SPOTS.forEach(s=>{
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "outing-btn";
+      const iconEl = document.createElement("span");
+      iconEl.className = "oi-icon";
+      iconEl.textContent = s.icon;
+      btn.appendChild(iconEl);
+      const nameEl = document.createElement("span");
+      nameEl.textContent = s.name;
+      btn.appendChild(nameEl);
+      const costEl = document.createElement("span");
+      costEl.className = "oi-cost";
+      costEl.textContent = "🎫" + s.cost;
+      btn.appendChild(costEl);
+      if(doneToday || pts < s.cost) btn.disabled = true;
+      else btn.addEventListener("click", function(){ goOuting(s.key); });
+      grid.appendChild(btn);
+    });
+    card.appendChild(grid);
+    const note = document.createElement("div");
+    note.className = "gift-note";
+    note.textContent = doneToday
+      ? "今日はもうおでかけしたよ！また明日、どこに行くか考えておいてね🌙"
+      : "1日1回、ポイントを使ってふたりでおでかけできるよ。キャラごとにお気に入りの場所があるみたい…！";
+    card.appendChild(note);
+    container.appendChild(card);
+  }
+  function renderOutingAlbum(container, charKey){
+    if(!container) return;
+    const list = Array.isArray(state.outings) ? state.outings : [];
+    const card = document.createElement("div");
+    card.className = "outing-card card" + (charKey && CHAR_BY_KEY[charKey] ? " char-" + charKey : "");
+    const title = document.createElement("div");
+    title.className = "unlock-progress-title";
+    title.textContent = "📸 おでかけアルバム";
+    card.appendChild(title);
+    if(!list.length){
+      const empty = document.createElement("div");
+      empty.className = "gift-note";
+      empty.textContent = "まだ思い出がないよ。ポイントを貯めて、はじめてのおでかけに行こう！";
+      card.appendChild(empty);
+    } else {
+      list.slice(-8).reverse().forEach(o=>{
+        const spot = OUTING_BY_KEY[o.p];
+        const oc = CHAR_BY_KEY[o.c];
+        if(!spot) return;
+        const row = document.createElement("div");
+        row.className = "outing-album-row";
+        const dateEl = document.createElement("span");
+        dateEl.className = "oa-date";
+        const parts = (o.d || "").split("-");
+        dateEl.textContent = (parts.length === 3) ? (parseInt(parts[1],10) + "/" + parseInt(parts[2],10)) : "";
+        row.appendChild(dateEl);
+        const placeEl = document.createElement("span");
+        placeEl.className = "oa-place";
+        placeEl.textContent = spot.icon + " " + spot.name;
+        row.appendChild(placeEl);
+        if(oc){
+          const nmEl = document.createElement("span");
+          nmEl.className = "ap-rel-name char-" + o.c;
+          nmEl.textContent = oc.name + "と";
+          row.appendChild(nmEl);
+        }
+        if(o.sp || o.fav){
+          const spEl = document.createElement("span");
+          spEl.className = "oa-sp";
+          spEl.textContent = o.sp ? "✨とくべつ" : "💗お気に入り";
+          row.appendChild(spEl);
+        }
+        card.appendChild(row);
+      });
+      const cnt = document.createElement("div");
+      cnt.className = "outing-album-count";
+      cnt.textContent = "おでかけ回数：" + (typeof state.totalOutings === "number" ? state.totalOutings : list.length) + "回";
+      card.appendChild(cnt);
+    }
+    container.appendChild(card);
+  }
+  (function(){
+    const overlay = document.getElementById("outingOverlay");
+    if(overlay) overlay.addEventListener("click", function(e){
+      if(e.target === overlay){
+        overlay.classList.remove("show");
+        if(typeof flushPendingStory === "function") flushPendingStory();
+      }
+    });
   })();
 
   function updateMascot(){
@@ -10776,6 +11234,7 @@
     if(typeof renderUnlockProgress === "function") renderUnlockProgress();
     if(typeof renderClubAll === "function") renderClubAll();
     if(typeof checkStoryUnlocks === "function") checkStoryUnlocks(charKey);
+    if(delta > 0 && typeof spawnHeartBurst === "function") spawnHeartBurst(4);
   }
   function showDailyEventModal(charKey, ev){
     const overlay = document.getElementById("dailyEventOverlay");

@@ -2408,6 +2408,8 @@
   .stats-sec:last-child{ margin-bottom:0; }
   .stats-sec-h{ font-size:13px; font-weight:bold; color:#9b59b6; margin:0 0 10px; }
   body.dark-mode .stats-sec-h{ color:#c084fc; }
+  .stats-sub-h{ font-size:12.5px; font-weight:bold; color:#9b59b6; margin:12px 0 4px; }
+  body.dark-mode .stats-sub-h{ color:#c084fc; }
   .stats-big-row{ display:flex; gap:10px; margin-bottom:12px; }
   .stats-big{
     flex:1; text-align:center; background:#faf3f8; border-radius:14px; padding:12px 8px;
@@ -2802,6 +2804,48 @@
   .hiddendex-row .hx-date{ margin-left:auto; font-size:11px; color:#c9a83a; font-weight:700; white-space:nowrap; flex-shrink:0; }
   .hiddendex-count{ font-size:12px; color:#a080b0; margin-top:8px; }
   body.dark-mode .hiddendex-count{ color:#b399c2; }
+  .hiddendex-row.replayable{ cursor:pointer; border-radius:10px; transition:background 0.15s ease; }
+  .hiddendex-row.replayable:hover{ background:#fdf3f8; }
+  body.dark-mode .hiddendex-row.replayable:hover{ background:#3a2c38; }
+  .hiddendex-row .hx-replay{ font-size:11px; color:#d98aa8; font-weight:700; white-space:nowrap; flex-shrink:0; align-self:center; }
+  body.dark-mode .hiddendex-row .hx-replay{ color:#ff9ab8; }
+  .hx-char-row{ display:flex; flex-wrap:wrap; gap:6px; margin:10px 0 8px; justify-content:center; }
+  .hx-char-chip{ border:2px solid #e0d0e8; background:#faf5fc; border-radius:999px; padding:4px 11px; font-size:12px; font-weight:700; cursor:pointer; color:#7a6b82; }
+  .hx-char-chip.active{ border-color:#d98aa8; background:#ffeef5; color:#d6336c; }
+  body.dark-mode .hx-char-chip{ background:#241c2e; border-color:#4a3a5a; color:#c4b4d0; }
+  body.dark-mode .hx-char-chip.active{ border-color:#ff9ab8; background:#3a2530; color:#ff9ab8; }
+  .hidden-replay-note{ font-size:11px; color:#a080b0; margin-top:6px; }
+  body.dark-mode .hidden-replay-note{ color:#b399c2; }
+
+  /* ===== Ver 7.3: 作業時間の記録 ===== */
+  .timelog-card{ background:#fff; border-radius:24px; padding:16px 18px 18px; margin-top:16px; box-shadow:0 6px 16px rgba(180,160,200,0.18); }
+  body.dark-mode .timelog-card{ background:#3a3138; }
+  .timelog-stats{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:10px; }
+  .timelog-stat{ flex:1 1 30%; min-width:88px; background:#faf5fc; border-radius:12px; padding:8px 6px; text-align:center; }
+  body.dark-mode .timelog-stat{ background:#2e2630; }
+  .timelog-stat .tl-num{ font-size:16px; font-weight:800; color:#d6336c; }
+  body.dark-mode .timelog-stat .tl-num{ color:#ff9ab8; }
+  .timelog-stat .tl-lbl{ font-size:10.5px; color:#a080b0; margin-top:2px; }
+  body.dark-mode .timelog-stat .tl-lbl{ color:#b399c2; }
+  .timelog-btns{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:8px; }
+  .timelog-quick{ flex:1 1 20%; min-width:64px; min-height:38px; border:2px solid #cfe3f0; border-radius:12px; background:#f3f9fd; color:#3a5a7a; font-size:13px; font-weight:800; cursor:pointer; }
+  .timelog-quick:active{ transform:scale(0.96); }
+  body.dark-mode .timelog-quick{ background:#2c3540; border-color:#3f5060; color:#a8c8e8; }
+  .timelog-manual{ display:flex; gap:8px; align-items:center; }
+  .timelog-manual input{ flex:1; min-width:0; border:none; border-radius:12px; background:#faf3f7; color:var(--ink); padding:9px 10px; font-size:13px; outline:none; }
+  body.dark-mode .timelog-manual input{ background:#2e2630; color:#f0d8e0; }
+  .timelog-manual button{ border:none; border-radius:12px; min-height:38px; padding:0 14px; background:linear-gradient(135deg,#ff9a56,#ff6fa5); color:#fff; font-size:13px; font-weight:800; cursor:pointer; white-space:nowrap; }
+  .timelog-manual button#timelogUndo{ background:#eee2ea; color:#a080b0; }
+  body.dark-mode .timelog-manual button#timelogUndo{ background:#4a3a46; color:#c4b0c8; }
+  .timelog-manual button:disabled{ opacity:0.4; cursor:default; }
+  .timelog-note{ font-size:12px; color:#a080b0; margin-top:8px; line-height:1.5; }
+  body.dark-mode .timelog-note{ color:#b399c2; }
+  .stats-time-rank{ display:flex; align-items:center; gap:8px; font-size:13px; padding:5px 0; }
+  .stats-time-rank .str-title{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .stats-time-rank .str-time{ margin-left:auto; font-weight:800; color:#d6336c; white-space:nowrap; }
+  body.dark-mode .stats-time-rank .str-time{ color:#ff9ab8; }
+  .stats-time-rank .str-now{ font-size:10.5px; color:#3a7ab0; background:#eaf4fc; border-radius:999px; padding:1px 8px; white-space:nowrap; }
+  body.dark-mode .stats-time-rank .str-now{ background:#2c3a46; color:#8fc3ec; }
 
   @media (prefers-reduced-motion: reduce){
     .tab-pane.active{ animation:none; }
@@ -2872,6 +2916,22 @@
         </div>
       </div>
       <div class="checklist-note" id="checklistNote"></div>
+    </div>
+    <div class="timelog-card card" id="timelogCard">
+      <h2 class="checklist-title">⏱ 作業時間を記録</h2>
+      <div class="timelog-stats" id="timelogStats"></div>
+      <div class="timelog-btns">
+        <button type="button" class="timelog-quick" data-min="15">＋15分</button>
+        <button type="button" class="timelog-quick" data-min="30">＋30分</button>
+        <button type="button" class="timelog-quick" data-min="60">＋1時間</button>
+        <button type="button" class="timelog-quick" data-min="120">＋2時間</button>
+      </div>
+      <div class="timelog-manual">
+        <input type="number" id="timelogManualInput" min="1" max="960" placeholder="分数を入力">
+        <button type="button" id="timelogManualAdd">追加</button>
+        <button type="button" id="timelogUndo" disabled>↩ 取り消し</button>
+      </div>
+      <div class="timelog-note">今日この曲に使った時間を記録しよう。統計タブで合計や曲ごとの分析が見られるよ！</div>
     </div>
     <div class="procdl-card">
       <h2 class="procdl-title">⏰ 工程別締切</h2>
@@ -3105,6 +3165,21 @@
   </div>
 </div>
 
+<div class="overlay" id="hiddenReplayOverlay">
+  <div class="modal hidden-modal">
+    <h3>📔 ひみつの思い出</h3>
+    <div class="hd-icon" id="hiddenReplayIcon">✨</div>
+    <div class="hd-name" id="hiddenReplayName"></div>
+    <div class="hd-desc" id="hiddenReplayDesc"></div>
+    <div class="hx-char-row" id="hiddenReplayChars"></div>
+    <div id="hiddenReplayBody"></div>
+    <div class="hidden-replay-note">部員を選ぶと、その子のセリフが見られるよ</div>
+    <div class="modal-actions">
+      <button class="btn-complete-yes" id="hiddenReplayClose">とじる</button>
+    </div>
+  </div>
+</div>
+
 <div class="overlay" id="dailyEventOverlay">
   <div class="modal daily-event-modal">
     <h3 id="dailyEventTitle">💬 ちょっとした会話</h3>
@@ -3258,6 +3333,10 @@
     <div class="de-field">
       <span class="de-label">🎵 曲の属性</span>
       <div class="attr-chip-row" id="doneEditAttrRow"></div>
+    </div>
+    <div class="de-field">
+      <span class="de-label">⏱ 作業時間（時間）</span>
+      <input type="number" id="doneEditTime" min="0" step="0.5" placeholder="例: 12.5">
     </div>
     <div class="de-field">
       <span class="de-label">📝 メモ</span>
@@ -4772,8 +4851,20 @@
       lastAffectionCreditWeek: p.lastAffectionCreditWeek || "",
       lastAffectionPenaltyWeek: p.lastAffectionPenaltyWeek || "",
       affectionCredited: (p.affectionCredited && typeof p.affectionCredited === "object") ? Object.assign({}, p.affectionCredited) : {},
-      penalizedDeadlines: Array.isArray(p.penalizedDeadlines) ? p.penalizedDeadlines.slice() : []
+      penalizedDeadlines: Array.isArray(p.penalizedDeadlines) ? p.penalizedDeadlines.slice() : [],
+      timeLog: normalizeTimeLog(p.timeLog)
     };
+  }
+  // Ver7.3: 作業時間ログ（日付→分）を正規化
+  function normalizeTimeLog(raw){
+    const out = {};
+    if(!raw || typeof raw !== "object") return out;
+    Object.keys(raw).forEach(k=>{
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+      const v = raw[k];
+      if(typeof v === "number" && v > 0) out[k] = Math.min(1440, Math.round(v));
+    });
+    return out;
   }
 
   const AFFECTION_MIN = -10;
@@ -4895,7 +4986,7 @@
   }
   function normalizeCompletedEntry(l){
     if(typeof l === "string"){
-      return { id:"", title:l||"（無題の曲）", completedAt:"", durationDays:0, memo:"", sources:"", sourcesList:[], theme:"", deadline:"", processDates:{}, processDeadlines:{}, attr:"" };
+      return { id:"", title:l||"（無題の曲）", completedAt:"", durationDays:0, memo:"", sources:"", sourcesList:[], theme:"", deadline:"", processDates:{}, processDeadlines:{}, attr:"", timeSpent:0 };
     }
     l = l || {};
     const sources = (typeof l.sources==="string") ? l.sources : "";
@@ -4911,7 +5002,8 @@
       deadline: (typeof l.deadline==="string") ? l.deadline : "",
       processDates: normalizeDatesMap(l.processDates),
       processDeadlines: normalizeDatesMap(l.processDeadlines),
-      attr: (typeof l.attr === "string" && SONG_ATTR_BY_KEY[l.attr]) ? l.attr : ""
+      attr: (typeof l.attr === "string" && SONG_ATTR_BY_KEY[l.attr]) ? l.attr : "",
+      timeSpent: (typeof l.timeSpent === "number" && l.timeSpent > 0) ? Math.round(l.timeSpent) : 0
     };
   }
   function normalizeCompletedLog(arr){
@@ -4989,7 +5081,8 @@
         lastOutingDate: (typeof parsed.lastOutingDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.lastOutingDate)) ? parsed.lastOutingDate : null,
         totalOutings: (typeof parsed.totalOutings === "number" && parsed.totalOutings >= 0) ? Math.floor(parsed.totalOutings) : 0,
         hiddenFound: (parsed.hiddenFound && typeof parsed.hiddenFound === "object") ? JSON.parse(JSON.stringify(parsed.hiddenFound)) : {},
-        processToday: (parsed.processToday && typeof parsed.processToday === "object" && typeof parsed.processToday.d === "string") ? { d: parsed.processToday.d, n: (typeof parsed.processToday.n === "number" ? parsed.processToday.n : 0) } : null
+        processToday: (parsed.processToday && typeof parsed.processToday === "object" && typeof parsed.processToday.d === "string") ? { d: parsed.processToday.d, n: (typeof parsed.processToday.n === "number" ? parsed.processToday.n : 0) } : null,
+        workLog: normalizeTimeLog(parsed.workLog)
       };
     }
     if(parsed.entries || parsed.title!==undefined || parsed.theme!==undefined){
@@ -5041,7 +5134,8 @@
         lastOutingDate: (typeof parsed.lastOutingDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(parsed.lastOutingDate)) ? parsed.lastOutingDate : null,
         totalOutings: (typeof parsed.totalOutings === "number" && parsed.totalOutings >= 0) ? Math.floor(parsed.totalOutings) : 0,
         hiddenFound: (parsed.hiddenFound && typeof parsed.hiddenFound === "object") ? JSON.parse(JSON.stringify(parsed.hiddenFound)) : {},
-        processToday: (parsed.processToday && typeof parsed.processToday === "object" && typeof parsed.processToday.d === "string") ? { d: parsed.processToday.d, n: (typeof parsed.processToday.n === "number" ? parsed.processToday.n : 0) } : null
+        processToday: (parsed.processToday && typeof parsed.processToday === "object" && typeof parsed.processToday.d === "string") ? { d: parsed.processToday.d, n: (typeof parsed.processToday.n === "number" ? parsed.processToday.n : 0) } : null,
+        workLog: normalizeTimeLog(parsed.workLog)
       };
     }
     return null;
@@ -5102,7 +5196,8 @@
       lastOutingDate: null,
       totalOutings: 0,
       hiddenFound: {},
-      processToday: null
+      processToday: null,
+      workLog: {}
     };
   }
   // Ver7: おでかけの思い出（アルバム）を正規化。直近120件まで保持。
@@ -5163,7 +5258,8 @@
           theme: p.theme || "",
           deadline: p.deadline || "",
           processDates: Object.assign({}, p.processChecklistDates || {}),
-          processDeadlines: Object.assign({}, p.processDeadlines || {})
+          processDeadlines: Object.assign({}, p.processDeadlines || {}),
+          timeSpent: projectTimeSum(p)
         }));
         loggedIds[pid] = true;
       }
@@ -5228,6 +5324,8 @@
     // Ver7.1: 隠しイベント用フィールド（サイレント移行）
     if(!state.hiddenFound || typeof state.hiddenFound !== "object") state.hiddenFound = {};
     if(!state.processToday || typeof state.processToday !== "object" || typeof state.processToday.d !== "string") state.processToday = null;
+    // Ver7.3: 作業時間ログ（サイレント移行）
+    if(!state.workLog || typeof state.workLog !== "object") state.workLog = {};
     saveState();
   })();
   // ---- Migration: ご褒美システム。既存ユーザーが読み込んだ時点で条件を
@@ -5538,6 +5636,7 @@
     renderProcessChecklist();
     renderProcessDeadlines();
     checkDeadlinePenalties();
+    if(typeof renderTimeLog === "function") renderTimeLog();
   }
   projectSelect.addEventListener("change", ()=>{
     state.currentProjectId = projectSelect.value;
@@ -5940,7 +6039,8 @@
       processDates: Object.assign({}, proj.processChecklistDates || {}),
       processDeadlines: Object.assign({}, proj.processDeadlines || {}),
       attr: "",
-      genre: _completedGenre
+      genre: _completedGenre,
+      timeSpent: projectTimeSum(proj)
     });
     (function(){
       const n = state.completedLog.length;
@@ -9804,12 +9904,20 @@
         const parts = (rec.d || "").split("-");
         dt.textContent = (parts.length===3) ? ("✔ " + parseInt(parts[1],10) + "/" + parseInt(parts[2],10)) : "✔";
         row.appendChild(dt);
+        // Ver7.2: 発見済みイベントはタップで「思い出リプレイ」。
+        // 他の部員を選んで、その子のセリフも見られる。
+        const rp = document.createElement("span");
+        rp.className = "hx-replay";
+        rp.textContent = "▶ セリフ";
+        row.appendChild(rp);
+        row.classList.add("replayable");
+        row.addEventListener("click", function(){ openHiddenReplay(ev.key); });
       }
       card.appendChild(row);
     });
     const cnt = document.createElement("div");
     cnt.className = "hiddendex-count";
-    cnt.textContent = "発見：" + n + " / " + HIDDEN_EVENTS.length + "　ひみつの条件を満たすと見つかるよ…！";
+    cnt.textContent = "発見：" + n + " / " + HIDDEN_EVENTS.length + "　発見済みをタップすると、部員みんなのセリフを見返せるよ！";
     card.appendChild(cnt);
     container.appendChild(card);
   }
@@ -9822,6 +9930,189 @@
       if(tmp.firstChild) parent.replaceChild(tmp.firstChild, old);
     }
   }
+
+  // ===== Ver 7.3: 作業時間の記録 =====
+  function ensureTimeLog(p){
+    if(!p.timeLog || typeof p.timeLog !== "object") p.timeLog = {};
+    return p.timeLog;
+  }
+  function ensureWorkLog(){
+    if(!state.workLog || typeof state.workLog !== "object") state.workLog = {};
+    return state.workLog;
+  }
+  function projectTimeSum(p){
+    if(!p || !p.timeLog || typeof p.timeLog !== "object") return 0;
+    let s = 0;
+    Object.keys(p.timeLog).forEach(k=>{ const v = p.timeLog[k]; if(typeof v === "number" && v > 0) s += v; });
+    return s;
+  }
+  function totalWorkMinutes(){
+    const wl = ensureWorkLog();
+    let s = 0;
+    Object.keys(wl).forEach(k=>{ const v = wl[k]; if(typeof v === "number" && v > 0) s += v; });
+    return s;
+  }
+  function fmtWorkTime(min){
+    if(!min || min <= 0) return "0分";
+    if(min < 60) return min + "分";
+    const h = Math.round((min / 60) * 10) / 10;
+    return (h % 1 === 0 ? String(Math.round(h)) : String(h)) + "時間";
+  }
+  let timeAddHistory = []; // このセッションで追加した記録（取り消し用）
+  function addWorkTime(min){
+    min = Math.round(min);
+    if(!min || min <= 0) return;
+    min = Math.min(min, 1440);
+    const t = getTodayStr();
+    const p = currentProject();
+    const tl = ensureTimeLog(p);
+    tl[t] = Math.min(1440, (tl[t] || 0) + min);
+    const wl = ensureWorkLog();
+    wl[t] = (wl[t] || 0) + min;
+    timeAddHistory.push({ date: t, min: min, pid: state.currentProjectId });
+    if(timeAddHistory.length > 50) timeAddHistory.shift();
+    saveState();
+    renderTimeLog();
+    if(typeof renderStats === "function" && state.activeTab === "stats") renderStats();
+  }
+  function undoWorkTime(){
+    const last = timeAddHistory.pop();
+    if(!last) return;
+    const proj = state.projects && state.projects[last.pid];
+    if(proj && proj.timeLog && typeof proj.timeLog[last.date] === "number"){
+      proj.timeLog[last.date] = Math.max(0, proj.timeLog[last.date] - last.min);
+      if(proj.timeLog[last.date] === 0) delete proj.timeLog[last.date];
+    }
+    const wl = ensureWorkLog();
+    if(typeof wl[last.date] === "number"){
+      wl[last.date] = Math.max(0, wl[last.date] - last.min);
+      if(wl[last.date] === 0) delete wl[last.date];
+    }
+    saveState();
+    renderTimeLog();
+    if(typeof renderStats === "function" && state.activeTab === "stats") renderStats();
+  }
+  function renderTimeLog(){
+    const box = document.getElementById("timelogStats");
+    if(!box) return;
+    const p = currentProject();
+    const t = getTodayStr();
+    const todayMin = (p.timeLog && typeof p.timeLog[t] === "number") ? p.timeLog[t] : 0;
+    const songMin = projectTimeSum(p);
+    const allMin = totalWorkMinutes();
+    box.innerHTML = "";
+    const mkStat = function(num, lbl){
+      const d = document.createElement("div");
+      d.className = "timelog-stat";
+      const n = document.createElement("div");
+      n.className = "tl-num";
+      n.textContent = num;
+      const l = document.createElement("div");
+      l.className = "tl-lbl";
+      l.textContent = lbl;
+      d.appendChild(n); d.appendChild(l);
+      return d;
+    };
+    box.appendChild(mkStat(fmtWorkTime(todayMin), "今日この曲"));
+    box.appendChild(mkStat(fmtWorkTime(songMin), "この曲の合計"));
+    box.appendChild(mkStat(fmtWorkTime(allMin), "ぜんぶの合計"));
+    const undoBtn = document.getElementById("timelogUndo");
+    if(undoBtn) undoBtn.disabled = timeAddHistory.length === 0;
+  }
+  (function(){
+    document.querySelectorAll(".timelog-quick").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        const m = parseInt(btn.getAttribute("data-min"), 10);
+        if(m > 0) addWorkTime(m);
+      });
+    });
+    const manualInput = document.getElementById("timelogManualInput");
+    const manualAdd = document.getElementById("timelogManualAdd");
+    const undoBtn = document.getElementById("timelogUndo");
+    if(manualAdd) manualAdd.addEventListener("click", function(){
+      if(!manualInput) return;
+      const m = parseInt(manualInput.value, 10);
+      if(!m || m <= 0){
+        if(typeof showAlertModal === "function") showAlertModal("⏱ 作業時間", "1〜960の分数を入れてね");
+        return;
+      }
+      addWorkTime(Math.min(m, 960));
+      manualInput.value = "";
+    });
+    if(undoBtn) undoBtn.addEventListener("click", undoWorkTime);
+  })();
+  // ===== Ver 7.2: ひみつの思い出リプレイ =====
+  // 一度発見したひみつイベントのセリフを、解放済みのほかの部員でも見返せる。
+  function hiddenLineFor(eventKey, charKey){
+    if(HIDDEN_CHAR_LINES[eventKey] && HIDDEN_CHAR_LINES[eventKey][charKey]) return HIDDEN_CHAR_LINES[eventKey][charKey];
+    const pool = HIDDEN_REACTIONS[charKey] || [];
+    if(!pool.length) return "";
+    return pool[Math.floor(Math.random() * pool.length)];
+  }
+  function replayUnlockedChars(){
+    if(typeof isCharUnlocked === "function"){
+      return CHAR_TYPES.filter(c=>isCharUnlocked(c.key)).map(c=>c.key);
+    }
+    const un = Array.isArray(state.unlockedChars) ? state.unlockedChars : ["bright"];
+    return CHAR_TYPES.filter(c=>un.indexOf(c.key)!==-1).map(c=>c.key);
+  }
+  function openHiddenReplay(eventKey){
+    const ev = HIDDEN_BY_KEY[eventKey];
+    const overlay = document.getElementById("hiddenReplayOverlay");
+    if(!ev || !overlay) return;
+    if(!state.hiddenFound || !state.hiddenFound[eventKey]) return; // 未発見はリプレイ不可
+    const iconEl = document.getElementById("hiddenReplayIcon");
+    const nameEl = document.getElementById("hiddenReplayName");
+    const descEl = document.getElementById("hiddenReplayDesc");
+    const charsEl = document.getElementById("hiddenReplayChars");
+    const bodyEl = document.getElementById("hiddenReplayBody");
+    if(iconEl) iconEl.textContent = ev.icon;
+    if(nameEl) nameEl.textContent = "「" + ev.title + "」";
+    if(descEl){
+      const arr = Array.isArray(ev.desc) ? ev.desc : [String(ev.desc || "")];
+      descEl.textContent = arr[0];
+    }
+    const chars = replayUnlockedChars();
+    let selected = (state.characterType && chars.indexOf(state.characterType)!==-1) ? state.characterType : (chars[0] || "bright");
+    const renderLine = function(ck){
+      if(!bodyEl || !CHAR_BY_KEY[ck]) return;
+      bodyEl.innerHTML = "";
+      const line = hiddenLineFor(eventKey, ck);
+      if(!line) return;
+      const row = mkClubEl("div", "celebrate-line char-" + ck);
+      row.appendChild(mkClubEl("span", "cl-name", CHAR_BY_KEY[ck].name));
+      row.appendChild(mkClubEl("span", "cl-text", line));
+      bodyEl.appendChild(row);
+    };
+    const renderChips = function(){
+      if(!charsEl) return;
+      charsEl.innerHTML = "";
+      chars.forEach(ck=>{
+        const ct = CHAR_BY_KEY[ck];
+        if(!ct) return;
+        const chip = document.createElement("button");
+        chip.type = "button";
+        chip.className = "hx-char-chip" + (ck === selected ? " active" : "");
+        chip.textContent = ct.name;
+        chip.addEventListener("click", function(){
+          selected = ck;
+          renderChips();
+          renderLine(ck);
+        });
+        charsEl.appendChild(chip);
+      });
+    };
+    renderChips();
+    renderLine(selected);
+    overlay.classList.add("show");
+  }
+  (function(){
+    const overlay = document.getElementById("hiddenReplayOverlay");
+    const closeBtn = document.getElementById("hiddenReplayClose");
+    const close = function(){ if(overlay) overlay.classList.remove("show"); };
+    if(closeBtn) closeBtn.addEventListener("click", close);
+    if(overlay) overlay.addEventListener("click", function(e){ if(e.target === overlay) close(); });
+  })();
 
   function updateMascot(){
     const {pct, totalEntries, donePct} = computeProgress();
@@ -10061,6 +10352,7 @@
     if(entry.attr && SONG_ATTR_BY_KEY[entry.attr]) marks.push(SONG_ATTR_BY_KEY[entry.attr].icon);
     if(entry.memo) marks.push("📝");
     if((Array.isArray(entry.sourcesList) && entry.sourcesList.length) || entry.sources) marks.push("🎹");
+    if(typeof entry.timeSpent === "number" && entry.timeSpent > 0) marks.push("⏱" + (Math.round((entry.timeSpent/60)*10)/10) + "h");
     flag.textContent = marks.join("");
     row.appendChild(date);
     row.appendChild(name);
@@ -10329,6 +10621,10 @@
     if(doneEditTitle) doneEditTitle.value = entry.title || "";
     if(doneEditDate) doneEditDate.textContent = entry.completedAt || "日付不明";
     if(doneEditMemo) doneEditMemo.value = entry.memo || "";
+    (function(){
+      const el = document.getElementById("doneEditTime");
+      if(el) el.value = (typeof entry.timeSpent === "number" && entry.timeSpent > 0) ? String(Math.round((entry.timeSpent/60)*10)/10) : "";
+    })();
     doneEditSources = (Array.isArray(entry.sourcesList) ? entry.sourcesList : []).map(it=>({cat:it.cat||"その他", name:it.name||""}));
     doneEditAttr = (entry.attr && SONG_ATTR_BY_KEY[entry.attr]) ? entry.attr : "";
     renderDoneEditAttrRow();
@@ -10354,7 +10650,27 @@
       // keep legacy string in sync for back-compat / older readers
       entry.sources = entry.sourcesList.map(it=>(it.cat?it.cat+"：":"")+it.name).join("\n");
       entry.attr = (doneEditAttr && SONG_ATTR_BY_KEY[doneEditAttr]) ? doneEditAttr : "";
+      // Ver7.3: 作業時間（時間単位で入力→分で保存）。差分は全体ログにも反映して
+      // 累計時間と曲別時間がズレないようにする。
+      (function(){
+        const el = document.getElementById("doneEditTime");
+        if(!el) return;
+        const raw = String(el.value || "").trim();
+        const hours = raw === "" ? 0 : parseFloat(raw);
+        if(isNaN(hours) || hours < 0) return;
+        const newMin = Math.round(hours * 60);
+        const oldMin = (typeof entry.timeSpent === "number" && entry.timeSpent > 0) ? entry.timeSpent : 0;
+        const delta = newMin - oldMin;
+        if(delta !== 0){
+          entry.timeSpent = newMin;
+          const d = (typeof entry.completedAt === "string" && /^\d{4}-\d{2}-\d{2}$/.test(entry.completedAt)) ? entry.completedAt : getTodayStr();
+          const wl = ensureWorkLog();
+          wl[d] = Math.max(0, (wl[d] || 0) + delta);
+          if(wl[d] === 0) delete wl[d];
+        }
+      })();
       saveState();
+      if(typeof renderTimeLog === "function") renderTimeLog();
       renderCompletedList();
       if(typeof renderStats === "function") renderStats();
       // セトリの属性バッジにも即反映
@@ -11201,6 +11517,79 @@
       }
     }
     statsBody.appendChild(secC);
+
+    // ---- (D) 作業時間の分析（Ver 7.3）----
+    const secD = mkEl("div", "stats-sec");
+    secD.appendChild(mkEl("div", "stats-sec-h", "⏱ 作業時間の分析"));
+    const wl = (state.workLog && typeof state.workLog === "object") ? state.workLog : {};
+    const wlKeys = Object.keys(wl).filter(k=>/^\d{4}-\d{2}-\d{2}$/.test(k) && wl[k] > 0);
+    const totalMin = wlKeys.reduce((s,k)=>s + wl[k], 0);
+    if(totalMin <= 0){
+      secD.appendChild(mkEl("div", "stats-note", "スケジュールタブの「⏱ 作業時間を記録」で時間をつけると、ここに合計や曲ごとの分析が表示されるよ！"));
+      statsBody.appendChild(secD);
+    } else {
+      const nowD = new Date();
+      const ymNow = getTodayStr().slice(0,7);
+      const monthMin = wlKeys.filter(k=>k.slice(0,7)===ymNow).reduce((s,k)=>s + wl[k], 0);
+      const bigRowD = mkEl("div", "stats-big-row");
+      const d1 = mkEl("div", "stats-big");
+      d1.appendChild(mkEl("div", "stats-big-num", fmtWorkTime(totalMin)));
+      d1.appendChild(mkEl("div", "stats-big-lbl", "累計作業時間"));
+      const d2 = mkEl("div", "stats-big");
+      d2.appendChild(mkEl("div", "stats-big-num", fmtWorkTime(monthMin)));
+      d2.appendChild(mkEl("div", "stats-big-lbl", "今月の作業時間"));
+      bigRowD.appendChild(d1);
+      bigRowD.appendChild(d2);
+      secD.appendChild(bigRowD);
+      // 直近6か月の月別バー
+      const months = [];
+      for(let i=5;i>=0;i--){
+        const md = new Date(nowD.getFullYear(), nowD.getMonth()-i, 1);
+        const ym = md.getFullYear() + "-" + String(md.getMonth()+1).padStart(2,"0");
+        const mMin = wlKeys.filter(k=>k.slice(0,7)===ym).reduce((s,k)=>s + wl[k], 0);
+        months.push({ label: (md.getMonth()+1) + "月", min: mMin });
+      }
+      const maxMonth = months.reduce((m,x)=>Math.max(m, x.min), 0) || 1;
+      months.forEach(mo=>{
+        secD.appendChild(statsBar(mo.label, fmtWorkTime(mo.min), (mo.min/maxMonth)*100));
+      });
+      // 記録日数と1日平均
+      const days = wlKeys.length;
+      if(days > 0){
+        const avgDay = Math.round(totalMin / days);
+        secD.appendChild(mkEl("div", "stats-note", "記録した日：" + days + "日 ・ 1日平均：" + fmtWorkTime(avgDay)));
+      }
+      // 1曲あたりの平均（完成曲で時間が記録されているもの）
+      const timedSongs = log.filter(l=>typeof l.timeSpent === "number" && l.timeSpent > 0);
+      if(timedSongs.length){
+        const perSong = Math.round(timedSongs.reduce((s,l)=>s + l.timeSpent, 0) / timedSongs.length);
+        secD.appendChild(mkEl("div", "stats-note", "1曲あたりの平均：" + fmtWorkTime(perSong) + "（記録あり " + timedSongs.length + "曲）"));
+      }
+      // 曲ごとの時間ランキング（完成曲 + 制作中の曲）
+      const rank = timedSongs.map(l=>({ title: l.title || "（無題の曲）", min: l.timeSpent, now: false }));
+      Object.keys(state.projects || {}).forEach(pid=>{
+        const p = state.projects[pid];
+        if(!p || p.completed) return;
+        const m = projectTimeSum(p);
+        if(m > 0) rank.push({ title: (p.title && p.title.trim()) ? p.title : "（無題の曲）", min: m, now: true });
+      });
+      if(rank.length){
+        secD.appendChild(mkEl("div", "stats-sub-h", "🎵 曲ごとの作業時間"));
+        rank.sort((a,b)=>b.min - a.min);
+        const maxSong = rank[0].min || 1;
+        rank.slice(0,8).forEach(r=>{
+          const row = mkEl("div", "stats-time-rank");
+          const tt = mkEl("span", "str-title", r.title);
+          row.appendChild(tt);
+          if(r.now) row.appendChild(mkEl("span", "str-now", "制作中"));
+          row.appendChild(mkEl("span", "str-time", fmtWorkTime(r.min)));
+          secD.appendChild(row);
+          secD.appendChild(statsBar("", "", (r.min/maxSong)*100));
+        });
+        if(rank.length > 8) secD.appendChild(mkEl("div", "stats-note", "ほか " + (rank.length-8) + " 曲"));
+      }
+      statsBody.appendChild(secD);
+    }
   }
 
   // ==================== Light music club (keionbu) system ====================

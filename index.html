@@ -2847,6 +2847,46 @@
   .stats-time-rank .str-now{ font-size:10.5px; color:#3a7ab0; background:#eaf4fc; border-radius:999px; padding:1px 8px; white-space:nowrap; }
   body.dark-mode .stats-time-rank .str-now{ background:#2c3a46; color:#8fc3ec; }
 
+  /* ===== Ver 7.4: カレンダーの作業時間表示＆日別入力 ===== */
+  .time-badge{
+    position:absolute;
+    bottom:3px; right:4px;
+    font-size:8.5px;
+    font-weight:800;
+    color:#3a7ab0;
+    background:#eaf4fc;
+    border-radius:999px;
+    padding:1px 5px;
+    z-index:3;
+    line-height:1.3;
+    white-space:nowrap;
+  }
+  body.dark-mode .time-badge{ background:#2c3a46; color:#8fc3ec; }
+  @media (max-width:420px){ .time-badge{ font-size:8px; padding:1px 4px; } }
+  .cal-time-summary{
+    margin-top:8px;
+    font-size:12px;
+    color:#7a6b82;
+    background:#f4f9fd;
+    border-radius:12px;
+    padding:8px 12px;
+    line-height:1.6;
+  }
+  body.dark-mode .cal-time-summary{ background:#2c3540; color:#c8d8e8; }
+  .cal-time-summary b{ color:#3a7ab0; }
+  body.dark-mode .cal-time-summary b{ color:#8fc3ec; }
+  .modal-time-wrap{ margin-top:10px; }
+  .modal-time-row{ display:flex; align-items:center; gap:6px; margin-top:6px; }
+  .modal-time-val{ font-size:14px; font-weight:800; color:#d6336c; margin-right:auto; white-space:nowrap; }
+  body.dark-mode .modal-time-val{ color:#ff9ab8; }
+  .mtl-btn{ border:2px solid #cfe3f0; border-radius:10px; background:#f3f9fd; color:#3a5a7a; font-size:12px; font-weight:800; cursor:pointer; padding:6px 8px; white-space:nowrap; }
+  .mtl-btn:active{ transform:scale(0.95); }
+  body.dark-mode .mtl-btn{ background:#2c3540; border-color:#3f5060; color:#a8c8e8; }
+  .modal-time-row2{ display:flex; gap:6px; margin-top:6px; }
+  .modal-time-row2 input{ flex:1; min-width:0; border:none; border-radius:10px; background:#faf3f7; color:var(--ink); padding:8px 10px; font-size:13px; outline:none; }
+  body.dark-mode .modal-time-row2 input{ background:#2e2630; color:#f0d8e0; }
+  .modal-time-row2 button{ border:none; border-radius:10px; padding:0 14px; min-height:34px; background:linear-gradient(135deg,#ff9a56,#ff6fa5); color:#fff; font-size:12px; font-weight:800; cursor:pointer; white-space:nowrap; }
+
   @media (prefers-reduced-motion: reduce){
     .tab-pane.active{ animation:none; }
     .overlay.show .modal{ animation:none; }
@@ -2904,6 +2944,7 @@
         </div>
       </div>
       <div class="progress-note" id="progressNote"></div>
+      <div class="cal-time-summary" id="calTimeSummary" style="display:none;"></div>
     </div>
     <div class="checklist-card">
       <h2 class="checklist-title">🛠 工程チェックリスト</h2>
@@ -3098,6 +3139,19 @@
   <div class="modal">
     <h3 id="modalDate">6月1日の予定</h3>
     <div id="optionList"></div>
+    <div class="modal-time-wrap">
+      <span class="memo-label">⏱ この日の作業時間</span>
+      <div class="modal-time-row">
+        <span class="modal-time-val" id="modalTimeVal">0分</span>
+        <button type="button" class="mtl-btn" data-min="15">＋15分</button>
+        <button type="button" class="mtl-btn" data-min="30">＋30分</button>
+        <button type="button" class="mtl-btn" data-min="60">＋1時間</button>
+      </div>
+      <div class="modal-time-row2">
+        <input type="number" id="modalTimeInput" min="0" max="1440" placeholder="分で直接入力（0でクリア）">
+        <button type="button" id="modalTimeSet">設定</button>
+      </div>
+    </div>
     <div class="memo-wrap">
       <span class="memo-label">📝 メモ</span>
       <textarea id="memoInput" placeholder="この日のメモを書けるよ"></textarea>
@@ -6693,6 +6747,17 @@
             memoBadge.textContent = "📝";
             td.appendChild(memoBadge);
           }
+          // Ver7.4: この日の作業時間バッジ（現在の曲）
+          (function(){
+            const tl = currentProject().timeLog;
+            const tmin = (tl && typeof tl[key] === "number") ? tl[key] : 0;
+            if(tmin > 0){
+              const tb = document.createElement("div");
+              tb.className = "time-badge";
+              tb.textContent = "⏱" + fmtBadgeTime(tmin);
+              td.appendChild(tb);
+            }
+          })();
 
           const dnum = document.createElement("div");
           dnum.className="daynum";
@@ -6705,6 +6770,35 @@
       }
       calBody.appendChild(tr);
     }
+
+    // Ver7.4: 表示中の月の作業時間まとめ（この曲＋全部の曲）
+    (function(){
+      const box = document.getElementById("calTimeSummary");
+      if(!box) return;
+      const ym = viewYear + "-" + String(viewMonth+1).padStart(2,"0");
+      const tl = currentProject().timeLog || {};
+      let projMin = 0;
+      Object.keys(tl).forEach(k=>{ if(k.slice(0,7)===ym && tl[k]>0) projMin += tl[k]; });
+      const wl = (state.workLog && typeof state.workLog === "object") ? state.workLog : {};
+      let allMin = 0;
+      Object.keys(wl).forEach(k=>{ if(k.slice(0,7)===ym && wl[k]>0) allMin += wl[k]; });
+      const days = Object.keys(tl).filter(k=>k.slice(0,7)===ym && tl[k]>0).length;
+      if(projMin<=0 && allMin<=0){
+        box.style.display = "none";
+      } else {
+        box.style.display = "";
+        box.innerHTML = "";
+        const b1 = document.createElement("b");
+        b1.textContent = fmtWorkTime(projMin);
+        const b2 = document.createElement("b");
+        b2.textContent = fmtWorkTime(allMin);
+        box.appendChild(document.createTextNode("⏱ " + (viewMonth+1) + "月の作業時間：この曲 "));
+        box.appendChild(b1);
+        box.appendChild(document.createTextNode("（" + days + "日）・ぜんぶで "));
+        box.appendChild(b2);
+        box.appendChild(document.createTextNode("　日付をタップすると時間を記入できるよ"));
+      }
+    })();
 
     updateMascot();
   }
@@ -6723,8 +6817,48 @@
     modalDate.textContent = `${m+1}月${d}日の予定`;
     renderOptions();
     memoInput.value = currentProject().memos[key] || "";
+    if(typeof renderModalTime === "function") renderModalTime();
     overlay.classList.add("show");
   }
+  // Ver7.4: 日別モーダルの作業時間表示＆入力
+  function renderModalTime(){
+    const valEl = document.getElementById("modalTimeVal");
+    if(!valEl || !currentKey) return;
+    const tl = currentProject().timeLog;
+    const min = (tl && typeof tl[currentKey] === "number") ? tl[currentKey] : 0;
+    valEl.textContent = (typeof fmtWorkTime === "function") ? fmtWorkTime(min) : (min + "分");
+    const inp = document.getElementById("modalTimeInput");
+    if(inp) inp.value = "";
+  }
+  (function(){
+    document.querySelectorAll(".modal-time-wrap .mtl-btn").forEach(function(btn){
+      btn.addEventListener("click", function(){
+        if(!currentKey) return;
+        const m = parseInt(btn.getAttribute("data-min"), 10);
+        if(m > 0 && typeof addWorkTimeOn === "function"){
+          addWorkTimeOn(currentKey, m);
+          renderModalTime();
+        }
+      });
+    });
+    const setBtn = document.getElementById("modalTimeSet");
+    if(setBtn) setBtn.addEventListener("click", function(){
+      if(!currentKey) return;
+      const inp = document.getElementById("modalTimeInput");
+      if(!inp) return;
+      const raw = String(inp.value || "").trim();
+      if(raw === "") return;
+      const m = parseInt(raw, 10);
+      if(isNaN(m) || m < 0){
+        if(typeof showAlertModal === "function") showAlertModal("⏱ 作業時間", "0〜1440の分数を入れてね");
+        return;
+      }
+      if(typeof setWorkTimeOn === "function"){
+        setWorkTimeOn(currentKey, m);
+        renderModalTime();
+      }
+    });
+  })();
   function closeModal(){
     overlay.classList.remove("show");
     currentKey = null;
@@ -9959,21 +10093,47 @@
     return (h % 1 === 0 ? String(Math.round(h)) : String(h)) + "時間";
   }
   let timeAddHistory = []; // このセッションで追加した記録（取り消し用）
-  function addWorkTime(min){
+  function refreshTimeViews(){
+    renderTimeLog();
+    if(typeof renderCalendar === "function") renderCalendar();
+    if(typeof renderStats === "function" && state.activeTab === "stats") renderStats();
+  }
+  // Ver7.4: 任意の日付に作業時間を追加できるように一般化（カレンダーの日別入力用）
+  function addWorkTimeOn(dateKey, min){
     min = Math.round(min);
     if(!min || min <= 0) return;
+    if(typeof dateKey !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return;
     min = Math.min(min, 1440);
-    const t = getTodayStr();
     const p = currentProject();
     const tl = ensureTimeLog(p);
-    tl[t] = Math.min(1440, (tl[t] || 0) + min);
+    tl[dateKey] = Math.min(1440, (tl[dateKey] || 0) + min);
     const wl = ensureWorkLog();
-    wl[t] = (wl[t] || 0) + min;
-    timeAddHistory.push({ date: t, min: min, pid: state.currentProjectId });
+    wl[dateKey] = (wl[dateKey] || 0) + min;
+    timeAddHistory.push({ date: dateKey, min: min, pid: state.currentProjectId });
     if(timeAddHistory.length > 50) timeAddHistory.shift();
     saveState();
-    renderTimeLog();
-    if(typeof renderStats === "function" && state.activeTab === "stats") renderStats();
+    refreshTimeViews();
+  }
+  // Ver7.4: 日付の記録を「この値にする」（0でクリア）。差分は全体ログにも反映。
+  function setWorkTimeOn(dateKey, min){
+    if(typeof dateKey !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return;
+    min = Math.round(min);
+    if(isNaN(min) || min < 0) min = 0;
+    min = Math.min(min, 1440);
+    const p = currentProject();
+    const tl = ensureTimeLog(p);
+    const old = (typeof tl[dateKey] === "number") ? tl[dateKey] : 0;
+    const delta = min - old;
+    if(delta === 0) return;
+    if(min === 0) delete tl[dateKey]; else tl[dateKey] = min;
+    const wl = ensureWorkLog();
+    wl[dateKey] = Math.max(0, (wl[dateKey] || 0) + delta);
+    if(wl[dateKey] === 0) delete wl[dateKey];
+    saveState();
+    refreshTimeViews();
+  }
+  function addWorkTime(min){
+    addWorkTimeOn(getTodayStr(), min);
   }
   function undoWorkTime(){
     const last = timeAddHistory.pop();
@@ -9989,8 +10149,14 @@
       if(wl[last.date] === 0) delete wl[last.date];
     }
     saveState();
-    renderTimeLog();
-    if(typeof renderStats === "function" && state.activeTab === "stats") renderStats();
+    refreshTimeViews();
+  }
+  // Ver7.4: カレンダーのセル用の短い時間表記（例: 45分 / 1.5h）
+  function fmtBadgeTime(min){
+    if(!min || min <= 0) return "";
+    if(min < 60) return min + "分";
+    const h = Math.round((min / 60) * 10) / 10;
+    return (h % 1 === 0 ? String(Math.round(h)) : String(h)) + "h";
   }
   function renderTimeLog(){
     const box = document.getElementById("timelogStats");

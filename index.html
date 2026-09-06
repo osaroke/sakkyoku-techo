@@ -2840,6 +2840,15 @@
   .timelog-manual button:disabled{ opacity:0.4; cursor:default; }
   .timelog-note{ font-size:12px; color:#a080b0; margin-top:8px; line-height:1.5; }
   body.dark-mode .timelog-note{ color:#b399c2; }
+  .timelog-reward{ margin-top:10px; background:#fff8ec; border-radius:12px; padding:8px 10px; }
+  body.dark-mode .timelog-reward{ background:#3a3226; }
+  .timelog-reward .tlr-head{ font-size:13px; font-weight:800; color:#c98a2a; margin-bottom:5px; }
+  body.dark-mode .timelog-reward .tlr-head{ color:#ffd97a; }
+  .timelog-reward .tlr-track{ height:8px; border-radius:999px; background:#f0e2cc; overflow:hidden; }
+  body.dark-mode .timelog-reward .tlr-track{ background:#4a4032; }
+  .timelog-reward .tlr-fill{ height:100%; border-radius:999px; background:linear-gradient(90deg,#ffd166,#f4903f); transition:width 0.3s ease; }
+  .timelog-reward .tlr-note{ font-size:11px; color:#b0956a; margin-top:5px; line-height:1.5; }
+  body.dark-mode .timelog-reward .tlr-note{ color:#c4ae82; }
   .stats-time-rank{ display:flex; align-items:center; gap:8px; font-size:13px; padding:5px 0; }
   .stats-time-rank .str-title{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
   .stats-time-rank .str-time{ margin-left:auto; font-weight:800; color:#d6336c; white-space:nowrap; }
@@ -2972,7 +2981,8 @@
         <button type="button" id="timelogManualAdd">追加</button>
         <button type="button" id="timelogUndo" disabled>↩ 取り消し</button>
       </div>
-      <div class="timelog-note">今日この曲に使った時間を記録しよう。統計タブで合計や曲ごとの分析が見られるよ！</div>
+      <div class="timelog-reward" id="timelogReward"></div>
+      <div class="timelog-note">作業時間を30分記録するごとに🎫チケットが1枚もらえるよ（1日8枚まで）。キャラタブでアイテムと交換しよう！</div>
     </div>
     <div class="procdl-card">
       <h2 class="procdl-title">⏰ 工程別締切</h2>
@@ -3553,30 +3563,43 @@
   CHAR_TYPES.forEach(c=>CHAR_BY_KEY[c.key]=c);
 
   // ---- Feature 1: gifts ----
+  // Ver7.5: アイテム拡充（全18種）。作業時間🎫でどれでも交換できるよう、
+  // 安いおやつ系〜高級な機材系まで価格帯を段階的に配置。
   const GIFTS = [
-    {key:"okashi", icon:"🍬", name:"お菓子",       cost:5},
-    {key:"drink",  icon:"🥤", name:"飲み物",       cost:6},
-    {key:"score",  icon:"📜", name:"楽譜",         cost:12},
-    {key:"plush",  icon:"🧸", name:"ぬいぐるみ",   cost:14},
-    {key:"bouquet",icon:"💐", name:"花束",         cost:10},
-    {key:"accessory",icon:"💍", name:"アクセサリー", cost:16},
-    {key:"hon",    icon:"📖", name:"本",           cost:8},
+    // ちいさなおやつ・飲み物（気軽に渡せる）
+    {key:"okashi", icon:"🍬", name:"お菓子",       cost:4},
+    {key:"drink",  icon:"🥤", name:"飲み物",       cost:5},
+    {key:"ice",    icon:"🍦", name:"アイス",       cost:6},
+    {key:"tea",    icon:"🍵", name:"あたたかいお茶", cost:6},
     {key:"coffee", icon:"☕", name:"コーヒー",     cost:7},
-    {key:"game",   icon:"🎮", name:"ゲーム",       cost:15},
+    {key:"pudding",icon:"🍮", name:"プリン",       cost:8},
+    {key:"cake",   icon:"🍰", name:"ケーキ",       cost:11},
+    // 小物・雑貨
     {key:"charm",  icon:"🧿", name:"お守り",       cost:9},
-    {key:"cd",     icon:"💿", name:"自作CD",       cost:13}
+    {key:"hon",    icon:"📖", name:"本",           cost:9},
+    {key:"ribbon", icon:"🎀", name:"リボン",       cost:10},
+    {key:"bouquet",icon:"💐", name:"花束",         cost:12},
+    {key:"cd",     icon:"💿", name:"自作CD",       cost:13},
+    {key:"plush",  icon:"🧸", name:"ぬいぐるみ",   cost:15},
+    {key:"game",   icon:"🎮", name:"ゲーム",       cost:16},
+    // 音楽グッズ・ちょっと高級なもの
+    {key:"score",  icon:"📜", name:"楽譜",         cost:12},
+    {key:"accessory",icon:"💍", name:"アクセサリー", cost:18},
+    {key:"headphone",icon:"🎧", name:"ヘッドホン",  cost:22},
+    {key:"synth",  icon:"🎹", name:"ミニシンセ",   cost:28}
   ];
   const GIFT_BY_KEY = {};
   GIFTS.forEach(g=>GIFT_BY_KEY[g.key]=g);
+  // Ver7.5: 新アイテムぶんの好みも設定。全員が「大好き」する物が偏らないよう調整。
   const GIFT_PREFS = {
-    bright: { love:["okashi","drink"], like:["plush","game"], dislike:["hon"] },
-    quiet:  { love:["score","plush"],  like:["drink","hon"], dislike:["game"] },
-    tsun:   { love:["accessory"],      like:["coffee","game"], dislike:["plush"] },
-    gentle: { love:["bouquet","plush"],like:["okashi","charm"], dislike:["game"] },
-    honest: { love:["drink","okashi"], like:["bouquet","cd"], dislike:["hon"] },
-    ojou:   { love:["bouquet","accessory"], like:["score","charm"], dislike:["game","cd"] },
-    imouto: { love:["okashi","plush"], like:["drink","charm"], dislike:["coffee"] },
-    genius: { love:["score","cd"],     like:["coffee"], dislike:["plush","bouquet"] }
+    bright: { love:["okashi","drink","ice"],        like:["plush","game","cake","headphone"], dislike:["hon","tea"] },
+    quiet:  { love:["score","plush","tea"],         like:["drink","hon","headphone","pudding"], dislike:["game","ribbon"] },
+    tsun:   { love:["accessory","headphone"],       like:["coffee","game","score","cake"], dislike:["plush","pudding"] },
+    gentle: { love:["bouquet","plush","tea"],       like:["okashi","charm","cake","ribbon"], dislike:["game","synth"] },
+    honest: { love:["drink","okashi","cake"],       like:["bouquet","cd","ice","charm"], dislike:["hon","score"] },
+    ojou:   { love:["bouquet","accessory","tea"],   like:["score","charm","cake","ribbon"], dislike:["game","cd"] },
+    imouto: { love:["okashi","plush","pudding"],    like:["drink","charm","ice","ribbon"], dislike:["coffee","hon"] },
+    genius: { love:["score","cd","synth"],          like:["coffee","headphone","hon"], dislike:["plush","bouquet","ribbon"] }
   };
   // ---- Character profiles: instrument part / likes / dislikes ----
   const CHAR_PROFILES = {
@@ -4097,6 +4120,91 @@
     genius: { love:["……ボクの嗜好を正確に把握しているね。ありがとう。","ふ、悪くない選択だ。ボクは気に入ったよ。"],
               normal:["……ありがとう。ボクは無駄なものは受け取らない主義だが、これは別だ。","ボクに、か。……ありがたく受け取っておくよ。"],
               dislike:["……データ外の選択だ。だが、厚意は受け取るよ。","ふむ、ボクの効率とは合わないが……気持ちには感謝する。"] }
+  };
+
+  // Ver7.5: アイテムごとの専用セリフ（tier別セリフより優先）。
+  // 新アイテム＋高級アイテムには、その物ならではの反応を用意した。
+  const GIFT_ITEM_LINES = {
+    ice: {
+      bright:"アイスだーっ！えへへ、溶けないうちに食べよっ！はんぶんこする？",
+      quiet:"……つめたい。……頭が、きーんとする。……でも、好き。",
+      tsun:"アイス……？子どもじゃあるまいし。……ん、おいしい。ま、たまにはいいわね。",
+      gentle:"わあ、アイスですね……ふふ、ゆっくり味わっていただきますね♪",
+      honest:"アイス最高です！練習のあとのアイスって、なんでこんなにおいしいんでしょう！",
+      ojou:"あら、アイスクリーム。……ふふ、はしたないと言わずに頂きますわ。",
+      imouto:"アイスー！めい、いちご味がすきなの！せんぱいありがとーっ！",
+      genius:"急速な体温低下は集中力を回復させる。……理屈抜きに、うまいな。"
+    },
+    tea: {
+      bright:"あったかいお茶！……ふぅ、なんか落ち着くね。ひまり、こういうのも好きだよ。",
+      quiet:"……あったかい。……手のひらから、じんわり。……ありがとう。",
+      tsun:"お茶なんて渋いもの……。ま、まあ、作業の合間にはちょうどいいわね。",
+      gentle:"まあ、あたたかいお茶……。ほっとします……いちばん好きな時間です♪",
+      honest:"お茶いただきます！……ふぅ、なんか大人になった気分です！",
+      ojou:"良い茶葉ですわね。香りで分かりますわ。……ふふ、お手並み拝見ですこと。",
+      imouto:"あちちっ！……ふー、ふー。……うん、あまくておいしいっ！",
+      genius:"カフェインとテアニンのバランスが良い。思考の質が上がる一杯だ。"
+    },
+    pudding: {
+      bright:"プリンだー！ぷるぷるしてる！えへへ、幸せの味がするっ！",
+      quiet:"……プリン。……このやわらかさ、……好き。",
+      tsun:"ぷ、プリン？子どもっぽい……って言おうとしたけど。……おいしい。",
+      gentle:"ふふ、プリンですね……。ゆっくりすくって食べるの、しあわせです♪",
+      honest:"プリンだ！あおい、カラメルのところが特に好きなんです！",
+      ojou:"まあ、プリン。……素朴ですけれど、こういうお菓子も嫌いではありませんわ。",
+      imouto:"わーい、プリンっ！めい、いちばんすきなおやつなの！だいすきーっ！",
+      genius:"卵と牛乳の凝固点を利用した完璧な菓子だ。……理論的にも、おいしい。"
+    },
+    cake: {
+      bright:"ケーキ！？わー、今日なにかの記念日？えへへ、いただきまーす！",
+      quiet:"……ケーキ。……特別な日、みたい。……うれしい。",
+      tsun:"ケ、ケーキなんて……そんな、特別扱いしなくていいのに。……ありがと。",
+      gentle:"まあ、ケーキ……！こんなすてきなもの、いただいていいんですか……？",
+      honest:"ケーキ！すごいです先輩！あおい、こんな贅沢していいんでしょうか！",
+      ojou:"あら、なかなかのケーキですこと。……ええ、合格点を差し上げますわ。",
+      imouto:"ケーキだーっ！いちごはさいごに食べるの、めいのこだわりなのっ！",
+      genius:"糖分は脳の主要燃料だ。……という言い訳をしつつ、素直に嬉しいよ。"
+    },
+    ribbon: {
+      bright:"かわいいリボン！つけていい？……どう、似合ってる？えへへ！",
+      quiet:"……リボン。……わたしに、似合うかな。……つけて、みる。",
+      tsun:"リ、リボン！？　私にこんな可愛いもの……。……ま、まあ、つけてあげてもいいけど。",
+      gentle:"まあ、かわいらしいリボン……。ふふ、大切にしますね♪",
+      honest:"リボンですか！あおい、あんまり可愛いもの持ってないので……嬉しいです！",
+      ojou:"上品な色合いですわね。……ふふ、あなたの審美眼、悪くありませんこと。",
+      imouto:"かわいいーっ！めい、これつけてライブに出るのっ！",
+      genius:"……装飾品か。ボクの機能性重視とは相容れない。……いや、悪くない。ありがとう。"
+    },
+    headphone: {
+      bright:"ヘッドホンだ！これで細かい音までばっちり聴けるね！歌録り、がんばるよ！",
+      quiet:"……いいヘッドホン。……低音が、きれい。……ずっと、つけていたい。",
+      tsun:"こ、これ高いやつじゃない！？　……ふん、私の耳にふさわしいわね。ありがと。",
+      gentle:"わあ、ヘッドホン……。やさしい音がします……世界が変わりますね♪",
+      honest:"ヘッドホン！これでドラムの粒立ちも分かります！ありがとうございます！",
+      ojou:"良い機材ですわね。……わたくしの弦の響き、余さず捉えてくれそうですわ。",
+      imouto:"おっきいヘッドホン！めいの頭にはちょっと大きいけど……えへへ、うれしい！",
+      genius:"フラットな特性……素晴らしい。この解像度なら、ボクのミックスも次の次元へ行ける。"
+    },
+    synth: {
+      bright:"うわー、シンセだ！ぽちぽち押すだけで音が変わるの楽しい！",
+      quiet:"……音が、いっぱい入ってる。……ずっと、さわっていられる。",
+      tsun:"シ、シンセ……！？　こ、こんな高いもの……。……ばか。うれしいに決まってるでしょ。",
+      gentle:"まあ、こんな立派なもの……。ふふ、やさしい音色を探してみますね♪",
+      honest:"すごいです！こんな高価なもの、あおいがもらっていいんですか！？大事にします！",
+      ojou:"まあ……。電子楽器も、なかなか奥が深いものですわね。挑戦してみますわ。",
+      imouto:"シンセだーっ！めい、へんな音いっぱい出してみるねっ！ぴゅーん！",
+      genius:"っ……これは……！オシレータの構成が理想的だ。キミ、分かっているね。……最高の贈り物だよ。"
+    },
+    accessory: {
+      bright:"わっ、アクセサリー！？　えへへ……こういうの、ちょっと大人っぽくてドキドキするね！",
+      quiet:"……きれい。……つけたら、……見て、くれる？",
+      tsun:"なっ……こ、こんなの贈るなんて、どういうつもりよ！……ちゃんと、毎日つけるわよ。",
+      gentle:"こんな素敵なもの……ふふ、大切な日につけさせてくださいね♪",
+      honest:"あおいに、こんなに綺麗なものを……！一生の宝物にします！",
+      ojou:"まあ……。目利きですこと。わたくしに相応しい品ですわ。……ありがとう存じます。",
+      imouto:"きらきらーっ！めい、おとなになった気分！せんぱい、にあう？",
+      genius:"……装飾に意味を見出す日が来るとはね。キミがくれたという事実が、価値なんだ。"
+    }
   };
 
   // ---- Member relations (correlation between club members) ----
@@ -5136,7 +5244,8 @@
         totalOutings: (typeof parsed.totalOutings === "number" && parsed.totalOutings >= 0) ? Math.floor(parsed.totalOutings) : 0,
         hiddenFound: (parsed.hiddenFound && typeof parsed.hiddenFound === "object") ? JSON.parse(JSON.stringify(parsed.hiddenFound)) : {},
         processToday: (parsed.processToday && typeof parsed.processToday === "object" && typeof parsed.processToday.d === "string") ? { d: parsed.processToday.d, n: (typeof parsed.processToday.n === "number" ? parsed.processToday.n : 0) } : null,
-        workLog: normalizeTimeLog(parsed.workLog)
+        workLog: normalizeTimeLog(parsed.workLog),
+        timePtsAwarded: normalizeTimePts(parsed.timePtsAwarded)
       };
     }
     if(parsed.entries || parsed.title!==undefined || parsed.theme!==undefined){
@@ -5189,7 +5298,8 @@
         totalOutings: (typeof parsed.totalOutings === "number" && parsed.totalOutings >= 0) ? Math.floor(parsed.totalOutings) : 0,
         hiddenFound: (parsed.hiddenFound && typeof parsed.hiddenFound === "object") ? JSON.parse(JSON.stringify(parsed.hiddenFound)) : {},
         processToday: (parsed.processToday && typeof parsed.processToday === "object" && typeof parsed.processToday.d === "string") ? { d: parsed.processToday.d, n: (typeof parsed.processToday.n === "number" ? parsed.processToday.n : 0) } : null,
-        workLog: normalizeTimeLog(parsed.workLog)
+        workLog: normalizeTimeLog(parsed.workLog),
+        timePtsAwarded: normalizeTimePts(parsed.timePtsAwarded)
       };
     }
     return null;
@@ -5251,8 +5361,20 @@
       totalOutings: 0,
       hiddenFound: {},
       processToday: null,
-      workLog: {}
+      workLog: {},
+      timePtsAwarded: {}
     };
+  }
+  // Ver7.5: 作業時間から付与した🎫ポイント（日付→枚数、単調増加）を正規化
+  function normalizeTimePts(raw){
+    const out = {};
+    if(!raw || typeof raw !== "object") return out;
+    Object.keys(raw).forEach(k=>{
+      if(!/^\d{4}-\d{2}-\d{2}$/.test(k)) return;
+      const v = raw[k];
+      if(typeof v === "number" && v > 0) out[k] = Math.min(99, Math.round(v));
+    });
+    return out;
   }
   // Ver7: おでかけの思い出（アルバム）を正規化。直近120件まで保持。
   function normalizeOutings(raw){
@@ -5380,6 +5502,15 @@
     if(!state.processToday || typeof state.processToday !== "object" || typeof state.processToday.d !== "string") state.processToday = null;
     // Ver7.3: 作業時間ログ（サイレント移行）
     if(!state.workLog || typeof state.workLog !== "object") state.workLog = {};
+    // Ver7.5: 時間→ポイント付与の記録（サイレント移行）。既存の記録済み時間には
+    // さかのぼって付与しない（移行時点の分数ぶんを「付与済み」として初期化）。
+    if(!state.timePtsAwarded || typeof state.timePtsAwarded !== "object"){
+      state.timePtsAwarded = {};
+      Object.keys(state.workLog).forEach(k=>{
+        const target = Math.min(8, Math.floor((state.workLog[k]||0) / 30));
+        if(target > 0) state.timePtsAwarded[k] = target;
+      });
+    }
     saveState();
   })();
   // ---- Migration: ご褒美システム。既存ユーザーが読み込んだ時点で条件を
@@ -8660,6 +8791,9 @@
       addMemberExp(state.characterType, 4);
       // クエスト用：工程完了の累計（初回クレジット時のみ加算＝単調増加）。
       state.totalProcessDone = (typeof state.totalProcessDone === "number" ? state.totalProcessDone : 0) + 1;
+      // Ver7.5: 工程をひとつ終えるたびに🎫2枚（曲ごと初回のみ）。
+      if(typeof addGiftPoints === "function") addGiftPoints(2);
+      if(typeof spawnHeartBurst === "function") spawnHeartBurst(4, ["🎫","✨"]);
       if(typeof renderAffectionMeter === "function") renderAffectionMeter();
     }
     // Ver7.1: 隠しイベント用に「今日チェックした工程数」を数える。
@@ -9193,7 +9327,7 @@
     card.appendChild(grid);
     const note = document.createElement("div");
     note.className = "gift-note";
-    note.textContent = "みんな好みがちがうみたい。いろいろ渡して、反応を見てみよう！曲の完成やライブ成功でポイントが貯まるよ。";
+    note.textContent = "みんな好みがちがうみたい。いろいろ渡して、反応を見てみよう！🎫は作業時間の記録（30分で1枚）・工程チェック（1つで2枚）・曲の完成・ライブ成功で貯まるよ。";
     card.appendChild(note);
     container.appendChild(card);
   }
@@ -9338,7 +9472,12 @@
       const set = GIFT_REACTIONS[charKey] || {};
       const arr = (tier === "love" ? set.love : (tier === "dislike" ? set.dislike : set.normal)) || set.normal || [];
       const fallback = "ありがとう！嬉しいな！";
-      const line = arr.length ? arr[Math.floor(Math.random() * arr.length)] : fallback;
+      // Ver7.5: アイテム専用セリフがあればそれを優先（好き嫌いに関わらず、
+      // その物ならではの反応を見せる）。
+      let line = arr.length ? arr[Math.floor(Math.random() * arr.length)] : fallback;
+      if(GIFT_ITEM_LINES[giftKey] && GIFT_ITEM_LINES[giftKey][charKey]){
+        line = GIFT_ITEM_LINES[giftKey][charKey];
+      }
       const row = mkClubEl("div", "celebrate-line char-" + charKey);
       row.appendChild(mkClubEl("span", "cl-name", ct.name));
       row.appendChild(mkClubEl("span", "cl-text", line));
@@ -10111,8 +10250,10 @@
     wl[dateKey] = (wl[dateKey] || 0) + min;
     timeAddHistory.push({ date: dateKey, min: min, pid: state.currentProjectId });
     if(timeAddHistory.length > 50) timeAddHistory.shift();
+    if(typeof awardTimePoints === "function") awardTimePoints(dateKey);
     saveState();
     refreshTimeViews();
+    if(typeof renderAffectionInfo === "function" && state.activeTab === "chara") renderAffectionInfo();
   }
   // Ver7.4: 日付の記録を「この値にする」（0でクリア）。差分は全体ログにも反映。
   function setWorkTimeOn(dateKey, min){
@@ -10129,8 +10270,10 @@
     const wl = ensureWorkLog();
     wl[dateKey] = Math.max(0, (wl[dateKey] || 0) + delta);
     if(wl[dateKey] === 0) delete wl[dateKey];
+    if(typeof awardTimePoints === "function") awardTimePoints(dateKey);
     saveState();
     refreshTimeViews();
+    if(typeof renderAffectionInfo === "function" && state.activeTab === "chara") renderAffectionInfo();
   }
   function addWorkTime(min){
     addWorkTimeOn(getTodayStr(), min);
@@ -10158,6 +10301,50 @@
     const h = Math.round((min / 60) * 10) / 10;
     return (h % 1 === 0 ? String(Math.round(h)) : String(h)) + "h";
   }
+
+  // ===== Ver 7.5: 作業時間→🎫ポイント（30分ごとに1枚、1日8枚まで） =====
+  const TIME_PT_PER_MIN = 30;   // この分数ごとに🎫1枚
+  const TIME_PT_DAILY_CAP = 8;  // 1日に作業時間からもらえる上限
+  // 付与は日付ごとに単調増加（減らした後に入れ直しても二重取りできない）
+  const TIME_PT_LINES = {
+    bright:["おつかれさま！がんばったぶん、ちゃんとチケットになったよ！","作業えらい！ひまり、見てたよ〜！はい、ごほうび！"],
+    quiet:["……おつかれさま。……がんばりは、ちゃんと形になるよ。","……はい、チケット。……ちゃんと、見てたから。"],
+    tsun:["ふん、今日はよく働いたじゃない。……ほら、ごほうびよ！","べ、別にご褒美あげたくて見てたわけじゃないんだから！"],
+    gentle:["おつかれさまです……ふふ、がんばり屋さんにはごほうびですね♪","こつこつ積み重ねる姿、すてきです……はい、チケットどうぞ♪"],
+    honest:["先輩の努力、あおいはぜんぶ見てました！ごほうびです！","作業おつかれさまです！先輩、かっこよかったです！"],
+    ojou:["よく励みましたわね。ごほうびを差し上げますわ。","努力する姿は美しいですわ。……はい、チケットですわよ。"],
+    imouto:["せんぱいおつかれさまっ！めいからごほうびだよっ！","いっぱいがんばったね！えらいえらいっ！はい、チケット！"],
+    genius:["労働時間を検知した。報酬を支払おう。……当然の対価だよ。","キミの作業効率、記録しておいたよ。はい、報酬だ。"]
+  };
+  function awardTimePoints(dateKey){
+    if(typeof dateKey !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(dateKey)) return 0;
+    if(!state.timePtsAwarded || typeof state.timePtsAwarded !== "object") state.timePtsAwarded = {};
+    const wl = ensureWorkLog();
+    const minutes = (typeof wl[dateKey] === "number") ? wl[dateKey] : 0;
+    const target = Math.min(TIME_PT_DAILY_CAP, Math.floor(minutes / TIME_PT_PER_MIN));
+    const awarded = (typeof state.timePtsAwarded[dateKey] === "number") ? state.timePtsAwarded[dateKey] : 0;
+    if(target <= awarded) return 0;
+    const gain = target - awarded;
+    state.timePtsAwarded[dateKey] = target;
+    if(typeof state.giftPoints !== "number" || state.giftPoints < 0) state.giftPoints = 0;
+    state.giftPoints += gain; // addGiftPoints()は隠しイベント判定込みなので直接加算→あとでまとめて判定
+    if(typeof checkHiddenEvents === "function") checkHiddenEvents("points");
+    // 演出：🎫バースト＋キャラのひとこと
+    if(typeof spawnHeartBurst === "function") spawnHeartBurst(Math.min(3 + gain, 8), ["🎫","✨","🎵"]);
+    try{
+      const ck = state.characterType;
+      if(ck && ck !== "none" && TIME_PT_LINES[ck]){
+        const pool = TIME_PT_LINES[ck];
+        // updateMascot()がこの直後にセリフを引き直すため、levelUpBubbleTextと
+        // 同じ「保留→適用」の仕組みに乗せて上書きされないようにする。
+        levelUpBubbleText = "🎫+" + gain + "！ " + pool[Math.floor(Math.random() * pool.length)];
+      }
+    }catch(e){}
+    return gain;
+  }
+  function timePtsEarnedOn(dateKey){
+    return (state.timePtsAwarded && typeof state.timePtsAwarded[dateKey] === "number") ? state.timePtsAwarded[dateKey] : 0;
+  }
   function renderTimeLog(){
     const box = document.getElementById("timelogStats");
     if(!box) return;
@@ -10184,6 +10371,37 @@
     box.appendChild(mkStat(fmtWorkTime(allMin), "ぜんぶの合計"));
     const undoBtn = document.getElementById("timelogUndo");
     if(undoBtn) undoBtn.disabled = timeAddHistory.length === 0;
+    // Ver7.5: 今日もらった🎫と、次の1枚までの残り時間
+    const rw = document.getElementById("timelogReward");
+    if(rw){
+      const gotToday = (typeof timePtsEarnedOn === "function") ? timePtsEarnedOn(t) : 0;
+      const todayAll = (state.workLog && typeof state.workLog[t] === "number") ? state.workLog[t] : 0;
+      rw.innerHTML = "";
+      const head = document.createElement("div");
+      head.className = "tlr-head";
+      head.textContent = "🎫 今日のごほうび：" + gotToday + " / " + TIME_PT_DAILY_CAP + " 枚";
+      rw.appendChild(head);
+      const track = document.createElement("div");
+      track.className = "tlr-track";
+      const fill = document.createElement("div");
+      fill.className = "tlr-fill";
+      let pct, note;
+      if(gotToday >= TIME_PT_DAILY_CAP){
+        pct = 100;
+        note = "今日のごほうびは満タン！また明日ね🌙（作業時間の記録は続けられるよ）";
+      } else {
+        const rem = TIME_PT_PER_MIN - (todayAll % TIME_PT_PER_MIN);
+        pct = ((todayAll % TIME_PT_PER_MIN) / TIME_PT_PER_MIN) * 100;
+        note = "あと " + rem + "分 の記録で🎫がもう1枚もらえるよ！";
+      }
+      fill.style.width = pct + "%";
+      track.appendChild(fill);
+      rw.appendChild(track);
+      const noteEl = document.createElement("div");
+      noteEl.className = "tlr-note";
+      noteEl.textContent = note;
+      rw.appendChild(noteEl);
+    }
   }
   (function(){
     document.querySelectorAll(".timelog-quick").forEach(function(btn){
